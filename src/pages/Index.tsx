@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { initializeApp } from 'firebase/app';
 import { 
@@ -115,8 +114,8 @@ const Index = () => {
   const fetchLatestUpdates = async () => {
     setLoadingNews(true);
     try {
-      // Updated Gemini model configuration - use gemini-1.0-pro instead of gemini-pro
-      const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
+      // Updated Gemini model configuration - use gemini-pro instead of gemini-1.0-pro
+      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
       
       const prompt = `Generate 6 latest news updates about Indian dance and music in JSON format. Each update should include:
       - title: A compelling headline

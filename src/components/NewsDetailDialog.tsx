@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "lucide-react";
@@ -27,6 +27,7 @@ const NewsDetailDialog = ({ open, onOpenChange, newsItem }: NewsDetailDialogProp
       <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-orange-800">{newsItem.title}</DialogTitle>
+          <DialogDescription className="sr-only">Details about {newsItem.title}</DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4">
@@ -44,8 +45,13 @@ const NewsDetailDialog = ({ open, onOpenChange, newsItem }: NewsDetailDialogProp
               alt={newsItem.title}
               className="w-full h-full object-cover"
               onError={(e) => {
-                // Fallback image if the original fails to load
-                e.currentTarget.src = "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=400&fit=crop";
+                // Better fallback image handling with reliable fallbacks
+                const fallbackImages = [
+                  "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=400&fit=crop",
+                  "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&h=400&fit=crop",
+                  "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=400&fit=crop"
+                ];
+                e.currentTarget.src = fallbackImages[Math.floor(Math.random() * fallbackImages.length)];
               }}
             />
           </div>
