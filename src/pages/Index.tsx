@@ -31,7 +31,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// Initialize Gemini AI
+// Initialize Gemini AI with the correct API key
 const genAI = new GoogleGenerativeAI("AIzaSyDF5iTPenQShZq0lFf1_79pCXNjDOT5LA0");
 
 interface NewsItem {
@@ -102,7 +102,8 @@ const Index = () => {
   const fetchLatestUpdates = async () => {
     setLoadingNews(true);
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+      // Updated Gemini model configuration - use gemini-1.0-pro instead of gemini-pro
+      const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
       
       const prompt = `Generate 6 latest news updates about Indian dance and music in JSON format. Each update should include:
       - title: A compelling headline
@@ -125,7 +126,7 @@ const Index = () => {
         const parsedNews = JSON.parse(jsonMatch[0]);
         setNewsItems(parsedNews);
       } else {
-        // Fallback news items
+        // If no JSON is found, use fallback news items
         setNewsItems([
           {
             title: "Bharatanatyam Festival Returns to Chennai",
@@ -147,12 +148,65 @@ const Index = () => {
             category: "Classical Dance",
             imageUrl: "https://images.unsplash.com/photo-1583224964623-033ed52c6b3b?w=400&h=250&fit=crop",
             source: "Dance India"
+          },
+          {
+            title: "Carnatic Music Festival Celebrates 50th Anniversary",
+            description: "The prestigious festival will feature legendary performers and emerging talents from across South India.",
+            category: "Classical Music",
+            imageUrl: "https://images.unsplash.com/photo-1514119412350-e174d90d280e?w=400&h=250&fit=crop",
+            source: "Music Today"
+          },
+          {
+            title: "National Folk Dance Competition Announces New Categories",
+            description: "This year's competition will include regional folk styles from North-East India for the first time.",
+            category: "Folk Dance",
+            imageUrl: "https://images.unsplash.com/photo-1516280906200-bf71fe1b1e28?w=400&h=250&fit=crop",
+            source: "Cultural Times"
+          },
+          {
+            title: "Documentary on Hindustani Classical Masters Released",
+            description: "The critically acclaimed film explores the lives and contributions of legendary Hindustani Classical musicians.",
+            category: "Classical Music",
+            imageUrl: "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=400&h=250&fit=crop",
+            source: "Film Today"
           }
         ]);
       }
     } catch (error) {
       console.error('Error fetching updates:', error);
       toast.error('Failed to fetch latest updates');
+      
+      // Provide fallback news items in case of error
+      setNewsItems([
+        {
+          title: "Bharatanatyam Festival Returns to Chennai",
+          description: "The annual Bharatanatyam festival showcases traditional and contemporary performances by renowned artists from across India.",
+          category: "Classical Dance",
+          imageUrl: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=250&fit=crop",
+          source: "The Hindu"
+        },
+        {
+          title: "New Bollywood Album Breaks Streaming Records",
+          description: "Latest soundtrack featuring fusion of classical and modern elements reaches 10 million streams in first week.",
+          category: "Bollywood",
+          imageUrl: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop",
+          source: "Bollywood Hungama"
+        },
+        {
+          title: "Kathak Master Class Series Announced",
+          description: "International Kathak dancers to conduct virtual workshops for students worldwide this summer.",
+          category: "Classical Dance",
+          imageUrl: "https://images.unsplash.com/photo-1583224964623-033ed52c6b3b?w=400&h=250&fit=crop",
+          source: "Dance India"
+        },
+        {
+          title: "Carnatic Music Festival Celebrates 50th Anniversary",
+          description: "The prestigious festival will feature legendary performers and emerging talents from across South India.",
+          category: "Classical Music",
+          imageUrl: "https://images.unsplash.com/photo-1514119412350-e174d90d280e?w=400&h=250&fit=crop",
+          source: "Music Today"
+        }
+      ]);
     } finally {
       setLoadingNews(false);
     }
