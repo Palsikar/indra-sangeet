@@ -16,6 +16,9 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
+import { Pencil, ExternalLink } from 'lucide-react';
+import EditInterestsDialog from '@/components/EditInterestsDialog';
+import NewsDetailDialog from '@/components/NewsDetailDialog';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -59,6 +62,9 @@ const Index = () => {
     preferredCategories: ['Bharatanatyam', 'Kathak', 'Hindustani Classical', 'Carnatic Music']
   });
   const [loadingNews, setLoadingNews] = useState(false);
+  const [isEditInterestsOpen, setIsEditInterestsOpen] = useState(false);
+  const [selectedNewsItem, setSelectedNewsItem] = useState<NewsItem | null>(null);
+  const [isNewsDetailOpen, setIsNewsDetailOpen] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -71,6 +77,13 @@ const Index = () => {
 
     return () => unsubscribe();
   }, []);
+
+  // Effect to refetch news when user preferences change
+  useEffect(() => {
+    if (user) {
+      fetchLatestUpdates();
+    }
+  }, [userPreferences, user]);
 
   const handleAuth = async () => {
     setLoading(true);
@@ -222,6 +235,16 @@ const Index = () => {
     }
   };
 
+  const saveUpdatedPreferences = (newPreferences: UserPreferences) => {
+    setUserPreferences(newPreferences);
+    fetchLatestUpdates();
+  };
+
+  const openNewsDetail = (item: NewsItem) => {
+    setSelectedNewsItem(item);
+    setIsNewsDetailOpen(true);
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50 flex items-center justify-center p-4">
@@ -331,12 +354,20 @@ const Index = () => {
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {newsItems.map((item, index) => (
-                  <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow border-orange-200">
+                  <Card 
+                    key={index} 
+                    className="overflow-hidden hover:shadow-lg transition-shadow border-orange-200 cursor-pointer"
+                    onClick={() => openNewsDetail(item)}
+                  >
                     <div className="h-48 overflow-hidden">
                       <img 
                         src={item.imageUrl} 
                         alt={item.title}
                         className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                        onError={(e) => {
+                          // Fallback image if the original fails to load
+                          e.currentTarget.src = "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=250&fit=crop";
+                        }}
                       />
                     </div>
                     <CardContent className="p-4">
@@ -348,6 +379,18 @@ const Index = () => {
                       </div>
                       <h3 className="font-bold text-lg mb-2 text-orange-900">{item.title}</h3>
                       <p className="text-gray-700 text-sm leading-relaxed">{item.description}</p>
+                      
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="mt-2 text-orange-600 hover:text-orange-800 p-0 flex items-center"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openNewsDetail(item);
+                        }}
+                      >
+                        Read more <ExternalLink className="ml-1 h-4 w-4" />
+                      </Button>
                     </CardContent>
                   </Card>
                 ))}
@@ -357,8 +400,16 @@ const Index = () => {
 
           <TabsContent value="preferences" className="space-y-6">
             <Card className="border-orange-200">
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-orange-800">Your Interests</CardTitle>
+                <Button 
+                  onClick={() => setIsEditInterestsOpen(true)}
+                  variant="outline"
+                  size="sm"
+                  className="border-orange-300 text-orange-700 hover:bg-orange-100 flex items-center gap-1"
+                >
+                  <Pencil className="h-4 w-4" /> Edit Interests
+                </Button>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -404,6 +455,20 @@ const Index = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Dialogs */}
+      <EditInterestsDialog 
+        open={isEditInterestsOpen} 
+        onOpenChange={setIsEditInterestsOpen}
+        userPreferences={userPreferences}
+        onSave={saveUpdatedPreferences}
+      />
+      
+      <NewsDetailDialog 
+        open={isNewsDetailOpen}
+        onOpenChange={setIsNewsDetailOpen}
+        newsItem={selectedNewsItem}
+      />
     </div>
   );
 };
