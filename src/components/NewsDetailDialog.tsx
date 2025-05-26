@@ -3,7 +3,7 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar } from "lucide-react";
+import { Calendar, ExternalLink } from "lucide-react";
 
 interface NewsItem {
   title: string;
@@ -11,6 +11,7 @@ interface NewsItem {
   category: string;
   imageUrl: string;
   source: string;
+  sourceUrl?: string;
 }
 
 interface NewsDetailDialogProps {
@@ -21,6 +22,12 @@ interface NewsDetailDialogProps {
 
 const NewsDetailDialog = ({ open, onOpenChange, newsItem }: NewsDetailDialogProps) => {
   if (!newsItem) return null;
+
+  const handleSourceClick = () => {
+    if (newsItem.sourceUrl) {
+      window.open(newsItem.sourceUrl, '_blank');
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -45,7 +52,6 @@ const NewsDetailDialog = ({ open, onOpenChange, newsItem }: NewsDetailDialogProp
               alt={newsItem.title}
               className="w-full h-full object-cover"
               onError={(e) => {
-                // Better fallback image handling with reliable fallbacks
                 const fallbackImages = [
                   "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=400&fit=crop",
                   "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&h=400&fit=crop",
@@ -67,8 +73,20 @@ const NewsDetailDialog = ({ open, onOpenChange, newsItem }: NewsDetailDialogProp
               significant milestone for the {newsItem.category.toLowerCase()} community.
             </p>
             
-            <div className="italic text-sm text-gray-500">
-              Source: {newsItem.source}
+            <div className="flex items-center justify-between pt-4 border-t">
+              <div className="italic text-sm text-gray-500">
+                Source: {newsItem.source}
+              </div>
+              
+              {newsItem.sourceUrl && (
+                <Button 
+                  onClick={handleSourceClick}
+                  className="bg-orange-600 hover:bg-orange-700 flex items-center gap-2"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  Read Full Article
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -76,7 +94,8 @@ const NewsDetailDialog = ({ open, onOpenChange, newsItem }: NewsDetailDialogProp
         <DialogFooter>
           <Button 
             onClick={() => onOpenChange(false)}
-            className="bg-orange-600 hover:bg-orange-700"
+            variant="outline"
+            className="border-orange-300 text-orange-700"
           >
             Close
           </Button>
