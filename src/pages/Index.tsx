@@ -15,8 +15,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { toast } from 'sonner';
-import { Pencil, ExternalLink } from 'lucide-react';
+import { Pencil, ExternalLink, Calendar, Music, Users } from 'lucide-react';
 import EditInterestsDialog from '@/components/EditInterestsDialog';
 import NewsDetailDialog from '@/components/NewsDetailDialog';
 
@@ -49,6 +50,25 @@ interface UserPreferences {
   interests: string[];
   preferredCategories: string[];
 }
+
+// Random music/dance/instrument images
+const getRandomMusicImage = () => {
+  const musicImages = [
+    "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop", // music notes
+    "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=250&fit=crop", // classical dance
+    "https://images.unsplash.com/photo-1583224964623-033ed52c6b3b?w=400&h=250&fit=crop", // kathak dancer
+    "https://images.unsplash.com/photo-1514119412350-e174d90d280e?w=400&h=250&fit=crop", // sitar
+    "https://images.unsplash.com/photo-1516280906200-bf71fe1b1e28?w=400&h=250&fit=crop", // folk dance
+    "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=400&h=250&fit=crop", // tabla
+    "https://images.unsplash.com/photo-1465821185615-20b3c2fbf41b?w=400&h=250&fit=crop", // violin
+    "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=250&fit=crop", // music studio
+    "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=250&fit=crop", // technology music
+    "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=250&fit=crop", // woman with music
+    "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=250&fit=crop", // guitar
+    "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop", // concert
+  ];
+  return musicImages[Math.floor(Math.random() * musicImages.length)];
+};
 
 const Index = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -137,50 +157,55 @@ const Index = () => {
       const jsonMatch = text.match(/\[[\s\S]*\]/);
       if (jsonMatch) {
         const parsedNews = JSON.parse(jsonMatch[0]);
-        setNewsItems(parsedNews);
+        // Add random images to each news item
+        const newsWithImages = parsedNews.map((item: NewsItem) => ({
+          ...item,
+          imageUrl: getRandomMusicImage()
+        }));
+        setNewsItems(newsWithImages);
       } else {
-        // If no JSON is found, use fallback news items
+        // If no JSON is found, use fallback news items with random images
         setNewsItems([
           {
             title: "Bharatanatyam Festival Returns to Chennai",
             description: "The annual Bharatanatyam festival showcases traditional and contemporary performances by renowned artists from across India.",
             category: "Classical Dance",
-            imageUrl: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=250&fit=crop",
+            imageUrl: getRandomMusicImage(),
             source: "The Hindu"
           },
           {
             title: "New Bollywood Album Breaks Streaming Records",
             description: "Latest soundtrack featuring fusion of classical and modern elements reaches 10 million streams in first week.",
             category: "Bollywood",
-            imageUrl: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop",
+            imageUrl: getRandomMusicImage(),
             source: "Bollywood Hungama"
           },
           {
             title: "Kathak Master Class Series Announced",
             description: "International Kathak dancers to conduct virtual workshops for students worldwide this summer.",
             category: "Classical Dance",
-            imageUrl: "https://images.unsplash.com/photo-1583224964623-033ed52c6b3b?w=400&h=250&fit=crop",
+            imageUrl: getRandomMusicImage(),
             source: "Dance India"
           },
           {
             title: "Carnatic Music Festival Celebrates 50th Anniversary",
             description: "The prestigious festival will feature legendary performers and emerging talents from across South India.",
             category: "Classical Music",
-            imageUrl: "https://images.unsplash.com/photo-1514119412350-e174d90d280e?w=400&h=250&fit=crop",
+            imageUrl: getRandomMusicImage(),
             source: "Music Today"
           },
           {
             title: "National Folk Dance Competition Announces New Categories",
             description: "This year's competition will include regional folk styles from North-East India for the first time.",
             category: "Folk Dance",
-            imageUrl: "https://images.unsplash.com/photo-1516280906200-bf71fe1b1e28?w=400&h=250&fit=crop",
+            imageUrl: getRandomMusicImage(),
             source: "Cultural Times"
           },
           {
             title: "Documentary on Hindustani Classical Masters Released",
             description: "The critically acclaimed film explores the lives and contributions of legendary Hindustani Classical musicians.",
             category: "Classical Music",
-            imageUrl: "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=400&h=250&fit=crop",
+            imageUrl: getRandomMusicImage(),
             source: "Film Today"
           }
         ]);
@@ -189,34 +214,34 @@ const Index = () => {
       console.error('Error fetching updates:', error);
       toast.error('Failed to fetch latest updates');
       
-      // Provide fallback news items in case of error
+      // Provide fallback news items in case of error with random images
       setNewsItems([
         {
           title: "Bharatanatyam Festival Returns to Chennai",
           description: "The annual Bharatanatyam festival showcases traditional and contemporary performances by renowned artists from across India.",
           category: "Classical Dance",
-          imageUrl: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=250&fit=crop",
+          imageUrl: getRandomMusicImage(),
           source: "The Hindu"
         },
         {
           title: "New Bollywood Album Breaks Streaming Records",
           description: "Latest soundtrack featuring fusion of classical and modern elements reaches 10 million streams in first week.",
           category: "Bollywood",
-          imageUrl: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop",
+          imageUrl: getRandomMusicImage(),
           source: "Bollywood Hungama"
         },
         {
           title: "Kathak Master Class Series Announced",
           description: "International Kathak dancers to conduct virtual workshops for students worldwide this summer.",
           category: "Classical Dance",
-          imageUrl: "https://images.unsplash.com/photo-1583224964623-033ed52c6b3b?w=400&h=250&fit=crop",
+          imageUrl: getRandomMusicImage(),
           source: "Dance India"
         },
         {
           title: "Carnatic Music Festival Celebrates 50th Anniversary",
           description: "The prestigious festival will feature legendary performers and emerging talents from across South India.",
           category: "Classical Music",
-          imageUrl: "https://images.unsplash.com/photo-1514119412350-e174d90d280e?w=400&h=250&fit=crop",
+          imageUrl: getRandomMusicImage(),
           source: "Music Today"
         }
       ]);
@@ -354,45 +379,64 @@ const Index = () => {
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {newsItems.map((item, index) => (
-                  <Card 
-                    key={index} 
-                    className="overflow-hidden hover:shadow-lg transition-shadow border-orange-200 cursor-pointer"
-                    onClick={() => openNewsDetail(item)}
-                  >
-                    <div className="h-48 overflow-hidden">
-                      <img 
-                        src={item.imageUrl} 
-                        alt={item.title}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                        onError={(e) => {
-                          // Fallback image if the original fails to load
-                          e.currentTarget.src = "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=250&fit=crop";
-                        }}
-                      />
-                    </div>
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Badge variant="secondary" className="bg-orange-100 text-orange-800">
-                          {item.category}
-                        </Badge>
-                        <span className="text-sm text-gray-500">{item.source}</span>
-                      </div>
-                      <h3 className="font-bold text-lg mb-2 text-orange-900">{item.title}</h3>
-                      <p className="text-gray-700 text-sm leading-relaxed">{item.description}</p>
-                      
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="mt-2 text-orange-600 hover:text-orange-800 p-0 flex items-center"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openNewsDetail(item);
-                        }}
+                  <HoverCard key={index}>
+                    <HoverCardTrigger asChild>
+                      <Card 
+                        className="overflow-hidden hover:shadow-xl transition-all duration-300 border-orange-200 cursor-pointer transform hover:scale-105"
+                        onClick={() => openNewsDetail(item)}
                       >
-                        Read more <ExternalLink className="ml-1 h-4 w-4" />
-                      </Button>
-                    </CardContent>
-                  </Card>
+                        <div className="h-48 overflow-hidden">
+                          <img 
+                            src={item.imageUrl} 
+                            alt={item.title}
+                            className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                            onError={(e) => {
+                              e.currentTarget.src = getRandomMusicImage();
+                            }}
+                          />
+                        </div>
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge variant="secondary" className="bg-orange-100 text-orange-800">
+                              {item.category}
+                            </Badge>
+                            <span className="text-sm text-gray-500">{item.source}</span>
+                          </div>
+                          <h3 className="font-bold text-lg mb-2 text-orange-900 line-clamp-2">{item.title}</h3>
+                          <p className="text-gray-700 text-sm leading-relaxed line-clamp-3">{item.description}</p>
+                          
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="mt-2 text-orange-600 hover:text-orange-800 p-0 flex items-center"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openNewsDetail(item);
+                            }}
+                          >
+                            Read more <ExternalLink className="ml-1 h-4 w-4" />
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </HoverCardTrigger>
+                    <HoverCardContent className="w-80 bg-white border-orange-200">
+                      <div className="flex flex-col space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <Music className="h-4 w-4 text-orange-600" />
+                          <span className="font-semibold text-orange-800">{item.category}</span>
+                        </div>
+                        <div className="flex items-center space-x-2 text-sm text-gray-500">
+                          <Calendar className="h-4 w-4" />
+                          <span>{new Date().toLocaleDateString()}</span>
+                        </div>
+                        <div className="flex items-center space-x-2 text-sm text-gray-500">
+                          <Users className="h-4 w-4" />
+                          <span>Source: {item.source}</span>
+                        </div>
+                        <p className="text-sm text-gray-700 mt-2">{item.description}</p>
+                      </div>
+                    </HoverCardContent>
+                  </HoverCard>
                 ))}
               </div>
             )}
@@ -437,7 +481,13 @@ const Index = () => {
                 <div>
                   <h4 className="font-semibold mb-2 text-orange-700">Quick Add Interests:</h4>
                   <div className="flex flex-wrap gap-2">
-                    {['Odissi', 'Kuchipudi', 'Manipuri', 'Mohiniyattam', 'Punjabi Folk', 'Qawwali'].map((interest) => (
+                    {[
+                      'Odissi', 'Kuchipudi', 'Manipuri', 'Mohiniyattam', 'Punjabi Folk', 'Qawwali',
+                      'Tabla', 'Sitar', 'Veena', 'Flute', 'Harmonium', 'Sarod',
+                      'Thumri', 'Ghazal', 'Bhajan', 'Kirtan', 'Sufi Music', 'Folk Songs',
+                      'Bharatanatyam Fusion', 'Contemporary Indian', 'Semi-Classical', 'Devotional Music',
+                      'Regional Folk Dances', 'Lavani', 'Garba', 'Bhangra', 'Giddha', 'Rouf'
+                    ].map((interest) => (
                       <Button
                         key={interest}
                         variant="outline"
