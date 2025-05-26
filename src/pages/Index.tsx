@@ -139,7 +139,7 @@ const Index = () => {
         .eq('user_id', userId)
         .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         console.error('Error loading preferences:', error);
         toast.error('Failed to load your preferences');
         return;
@@ -147,10 +147,12 @@ const Index = () => {
 
       if (data) {
         console.log('Loaded preferences:', data);
-        setUserPreferences({
+        const loadedPreferences = {
           interests: data.interests || [],
           preferredCategories: data.preferred_categories || []
-        });
+        };
+        setUserPreferences(loadedPreferences);
+        toast.success('Your preferences have been loaded!');
       } else {
         // Create default preferences for new user
         console.log('Creating default preferences for new user');
@@ -161,6 +163,7 @@ const Index = () => {
         
         await saveUserPreferences(userId, defaultPreferences);
         setUserPreferences(defaultPreferences);
+        toast.success('Default preferences created for you!');
       }
     } catch (error) {
       console.error('Error in loadUserPreferences:', error);
@@ -178,17 +181,23 @@ const Index = () => {
           interests: preferences.interests,
           preferred_categories: preferences.preferredCategories,
           updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
         });
 
       if (error) {
         console.error('Error saving preferences:', error);
         toast.error('Failed to save preferences');
+        return false;
       } else {
         console.log('Preferences saved successfully');
+        toast.success('Preferences saved successfully!');
+        return true;
       }
     } catch (error) {
       console.error('Error in saveUserPreferences:', error);
       toast.error('Failed to save preferences');
+      return false;
     }
   };
 
@@ -205,11 +214,7 @@ const Index = () => {
         });
         if (error) throw error;
         
-        if (data.user && !data.session) {
-          toast.success('Account created! Please check your email to verify your account.');
-        } else {
-          toast.success('Account created and logged in successfully!');
-        }
+        toast.success('Account created and logged in successfully!');
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -328,10 +333,13 @@ const Index = () => {
   };
 
   const updatePreferences = async (newInterest: string) => {
-    if (!user || userPreferences.interests.includes(newInterest)) {
-      if (userPreferences.interests.includes(newInterest)) {
-        toast.error('This interest is already in your list');
-      }
+    if (!user) {
+      toast.error('Please log in to add interests');
+      return;
+    }
+    
+    if (userPreferences.interests.includes(newInterest)) {
+      toast.error('This interest is already in your list');
       return;
     }
 
@@ -340,16 +348,19 @@ const Index = () => {
       interests: [...userPreferences.interests, newInterest]
     };
     
-    setUserPreferences(newPreferences);
-    await saveUserPreferences(user.id, newPreferences);
-    toast.success('Interest added to your preferences!');
+    const saved = await saveUserPreferences(user.id, newPreferences);
+    if (saved) {
+      setUserPreferences(newPreferences);
+    }
   };
 
   const saveUpdatedPreferences = async (newPreferences: UserPreferences) => {
     if (!user) return;
     
-    setUserPreferences(newPreferences);
-    await saveUserPreferences(user.id, newPreferences);
+    const saved = await saveUserPreferences(user.id, newPreferences);
+    if (saved) {
+      setUserPreferences(newPreferences);
+    }
   };
 
   const openNewsDetail = (item: NewsItem) => {
