@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
@@ -31,38 +30,44 @@ interface UserPreferences {
   preferredCategories: string[];
 }
 
-// Get relevant images based on news category and content
-const getRelevantImage = (title: string, category: string) => {
-  const categoryImages = {
+// Music and dance specific images
+const getMusicDanceImage = (title: string, category: string) => {
+  const musicDanceImages = {
     'Classical Dance': [
-      "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=250&fit=crop", // Bharatanatyam
-      "https://images.unsplash.com/photo-1583224964623-033ed52c6b3b?w=400&h=250&fit=crop", // Kathak
-      "https://images.unsplash.com/photo-1516280906200-bf71fe1b1e28?w=400&h=250&fit=crop", // Classical dance
+      "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=250&fit=crop", // Bharatanatyam dancer
+      "https://images.unsplash.com/photo-1583224964623-033ed52c6b3b?w=400&h=250&fit=crop", // Kathak performance
+      "https://images.unsplash.com/photo-1516280906200-bf71fe1b1e28?w=400&h=250&fit=crop", // Classical dance pose
+      "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=400&h=250&fit=crop", // Traditional dance
     ],
     'Folk Dance': [
       "https://images.unsplash.com/photo-1516280906200-bf71fe1b1e28?w=400&h=250&fit=crop", // Folk dance
-      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=250&fit=crop", // Traditional dance
+      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=250&fit=crop", // Traditional dance group
+      "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=400&h=250&fit=crop", // Cultural dance
     ],
     'Bollywood': [
-      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop", // Music notes
-      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=250&fit=crop", // Music studio
+      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop", // Music and dance
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=250&fit=crop", // Music production
+      "https://images.unsplash.com/photo-1516280906200-bf71fe1b1e28?w=400&h=250&fit=crop", // Dance performance
     ],
     'Classical Music': [
-      "https://images.unsplash.com/photo-1514119412350-e174d90d280e?w=400&h=250&fit=crop", // Sitar
-      "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=400&h=250&fit=crop", // Tabla
-      "https://images.unsplash.com/photo-1465821185615-20b3c2fbf41b?w=400&h=250&fit=crop", // Violin
+      "https://images.unsplash.com/photo-1514119412350-e174d90d280e?w=400&h=250&fit=crop", // Sitar player
+      "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=400&h=250&fit=crop", // Tabla drums
+      "https://images.unsplash.com/photo-1465821185615-20b3c2fbf41b?w=400&h=250&fit=crop", // Violin classical
+      "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=250&fit=crop", // Traditional instruments
     ],
     'Folk Music': [
-      "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=250&fit=crop", // Guitar
-      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop", // Music
+      "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=250&fit=crop", // Folk instruments
+      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop", // Music performance
+      "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=400&h=250&fit=crop", // Traditional music
     ],
     'Contemporary': [
-      "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=250&fit=crop", // Contemporary
+      "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=250&fit=crop", // Contemporary dance
       "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=250&fit=crop", // Modern dance
+      "https://images.unsplash.com/photo-1516280906200-bf71fe1b1e28?w=400&h=250&fit=crop", // Contemporary performance
     ]
   };
 
-  const images = categoryImages[category as keyof typeof categoryImages] || categoryImages['Classical Music'];
+  const images = musicDanceImages[category as keyof typeof musicDanceImages] || musicDanceImages['Classical Music'];
   return images[Math.floor(Math.random() * images.length)];
 };
 
@@ -86,6 +91,7 @@ const Index = () => {
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state changed:', event, session?.user?.email);
       setSession(session);
       setUser(session?.user ?? null);
       
@@ -94,16 +100,23 @@ const Index = () => {
         // Defer data loading to prevent deadlocks
         setTimeout(() => {
           loadUserPreferences(session.user.id);
-        }, 0);
+        }, 100);
+      } else {
+        // Clear preferences when user logs out
+        setUserPreferences({ interests: [], preferredCategories: [] });
+        setNewsItems([]);
       }
     });
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Initial session check:', session?.user?.email);
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        loadUserPreferences(session.user.id);
+        setTimeout(() => {
+          loadUserPreferences(session.user.id);
+        }, 100);
       }
     });
 
@@ -119,6 +132,7 @@ const Index = () => {
 
   const loadUserPreferences = async (userId: string) => {
     try {
+      console.log('Loading preferences for user:', userId);
       const { data, error } = await supabase
         .from('user_preferences')
         .select('*')
@@ -127,16 +141,19 @@ const Index = () => {
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error loading preferences:', error);
+        toast.error('Failed to load your preferences');
         return;
       }
 
       if (data) {
+        console.log('Loaded preferences:', data);
         setUserPreferences({
           interests: data.interests || [],
           preferredCategories: data.preferred_categories || []
         });
       } else {
         // Create default preferences for new user
+        console.log('Creating default preferences for new user');
         const defaultPreferences = {
           interests: ['classical dance', 'bollywood music'],
           preferredCategories: ['Bharatanatyam', 'Kathak', 'Hindustani Classical', 'Carnatic Music']
@@ -147,11 +164,13 @@ const Index = () => {
       }
     } catch (error) {
       console.error('Error in loadUserPreferences:', error);
+      toast.error('Failed to load preferences');
     }
   };
 
   const saveUserPreferences = async (userId: string, preferences: UserPreferences) => {
     try {
+      console.log('Saving preferences for user:', userId, preferences);
       const { error } = await supabase
         .from('user_preferences')
         .upsert({
@@ -164,9 +183,12 @@ const Index = () => {
       if (error) {
         console.error('Error saving preferences:', error);
         toast.error('Failed to save preferences');
+      } else {
+        console.log('Preferences saved successfully');
       }
     } catch (error) {
       console.error('Error in saveUserPreferences:', error);
+      toast.error('Failed to save preferences');
     }
   };
 
@@ -174,12 +196,20 @@ const Index = () => {
     setLoading(true);
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            emailRedirectTo: undefined // Disable email verification
+          }
         });
         if (error) throw error;
-        toast.success('Account created successfully! Please check your email for verification.');
+        
+        if (data.user && !data.session) {
+          toast.success('Account created! Please check your email to verify your account.');
+        } else {
+          toast.success('Account created and logged in successfully!');
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -189,6 +219,7 @@ const Index = () => {
         toast.success('Logged in successfully!');
       }
     } catch (error: any) {
+      console.error('Auth error:', error);
       toast.error(error.message);
     } finally {
       setLoading(false);
@@ -198,10 +229,9 @@ const Index = () => {
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut();
-      setNewsItems([]);
-      setUserPreferences({ interests: [], preferredCategories: [] });
       toast.success('Signed out successfully!');
     } catch (error: any) {
+      console.error('Sign out error:', error);
       toast.error(error.message);
     }
   };
@@ -234,7 +264,7 @@ const Index = () => {
         // Add relevant images to each news item
         const newsWithImages = parsedNews.map((item: NewsItem) => ({
           ...item,
-          imageUrl: getRelevantImage(item.title, item.category),
+          imageUrl: getMusicDanceImage(item.title, item.category),
           sourceUrl: item.sourceUrl || `https://example-news.com/${item.title.toLowerCase().replace(/\s+/g, '-')}`
         }));
         setNewsItems(newsWithImages);
@@ -285,7 +315,7 @@ const Index = () => {
           }
         ].map(item => ({
           ...item,
-          imageUrl: getRelevantImage(item.title, item.category)
+          imageUrl: getMusicDanceImage(item.title, item.category)
         }));
         setNewsItems(fallbackNews);
       }
@@ -448,7 +478,7 @@ const Index = () => {
                             alt={item.title}
                             className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
                             onError={(e) => {
-                              e.currentTarget.src = getRelevantImage(item.title, item.category);
+                              e.currentTarget.src = getMusicDanceImage(item.title, item.category);
                             }}
                           />
                         </div>
