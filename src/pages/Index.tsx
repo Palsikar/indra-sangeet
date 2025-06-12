@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { toast } from 'sonner';
-import { Pencil, ExternalLink, Calendar, Music, Users } from 'lucide-react';
+import { Pencil, ExternalLink, Calendar, Music, Users, X } from 'lucide-react';
 import EditInterestsDialog from '@/components/EditInterestsDialog';
 import NewsDetailDialog from '@/components/NewsDetailDialog';
 
@@ -368,6 +368,24 @@ const Index = () => {
     setIsNewsDetailOpen(true);
   };
 
+  const removeInterest = async (interestToRemove: string) => {
+    if (!user) {
+      toast.error('Please log in to remove interests');
+      return;
+    }
+
+    const newPreferences = {
+      ...userPreferences,
+      interests: userPreferences.interests.filter(interest => interest !== interestToRemove)
+    };
+    
+    const saved = await saveUserPreferences(user.id, newPreferences);
+    if (saved) {
+      setUserPreferences(newPreferences);
+      toast.success(`Removed "${interestToRemove}" from your interests`);
+    }
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50 flex items-center justify-center p-4">
@@ -573,8 +591,15 @@ const Index = () => {
                   <h4 className="font-semibold mb-2 text-orange-700">Current Interests:</h4>
                   <div className="flex flex-wrap gap-2">
                     {userPreferences.interests.map((interest, index) => (
-                      <Badge key={index} className="bg-orange-600 text-white">
+                      <Badge key={index} className="bg-orange-600 text-white flex items-center gap-1 pr-1">
                         {interest}
+                        <button 
+                          onClick={() => removeInterest(interest)}
+                          className="ml-1 hover:bg-orange-700 rounded-full p-0.5 transition-colors"
+                          title={`Remove ${interest}`}
+                        >
+                          <X size={12} />
+                        </button>
                       </Badge>
                     ))}
                     {userPreferences.interests.length === 0 && (

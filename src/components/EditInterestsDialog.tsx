@@ -28,6 +28,14 @@ const EditInterestsDialog = ({
   const [editedPreferences, setEditedPreferences] = useState<UserInterest>({...userPreferences});
   const [newInterest, setNewInterest] = useState("");
 
+  // Reset edited preferences when dialog opens
+  React.useEffect(() => {
+    if (open) {
+      setEditedPreferences({...userPreferences});
+      setNewInterest("");
+    }
+  }, [open, userPreferences]);
+
   const handleAddInterest = () => {
     if (!newInterest.trim()) return;
     
@@ -51,6 +59,12 @@ const EditInterestsDialog = ({
     toast.info(`Removed "${interest}" from your interests`);
   };
 
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleAddInterest();
+    }
+  };
+
   const handleSaveChanges = () => {
     onSave(editedPreferences);
     onOpenChange(false);
@@ -69,6 +83,7 @@ const EditInterestsDialog = ({
             <Input
               value={newInterest}
               onChange={(e) => setNewInterest(e.target.value)}
+              onKeyPress={handleKeyPress}
               placeholder="Add new interest"
               className="border-orange-200"
             />
@@ -89,7 +104,8 @@ const EditInterestsDialog = ({
                   {interest}
                   <button 
                     onClick={() => handleRemoveInterest(interest)}
-                    className="ml-1 hover:bg-orange-700 rounded-full p-1"
+                    className="ml-1 hover:bg-orange-700 rounded-full p-0.5 transition-colors"
+                    title={`Remove ${interest}`}
                   >
                     <X size={12} />
                   </button>
