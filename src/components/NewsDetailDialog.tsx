@@ -3,7 +3,7 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar } from "lucide-react";
+import { Calendar, Music, Volume2 } from "lucide-react";
 
 interface NewsItem {
   title: string;
@@ -23,35 +23,42 @@ const NewsDetailDialog = ({ open, onOpenChange, newsItem }: NewsDetailDialogProp
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-3xl border-purple-200 shadow-2xl">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-orange-800">{newsItem.title}</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-purple-800 flex items-center gap-2">
+            <Music className="h-6 w-6" />
+            {newsItem.title}
+          </DialogTitle>
           <DialogDescription className="sr-only">Details about {newsItem.title}</DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <Badge className="bg-orange-600">{newsItem.category}</Badge>
+            <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white flex items-center gap-1">
+              <Volume2 className="h-3 w-3" />
+              {newsItem.category}
+            </Badge>
             <div className="flex items-center text-sm text-gray-500">
               <Calendar className="h-4 w-4 mr-1" />
               <span>{new Date().toLocaleDateString()}</span>
             </div>
           </div>
           
-          <div className="relative w-full h-64 overflow-hidden rounded-md">
+          <div className="relative w-full h-64 overflow-hidden rounded-md shadow-lg">
             <img 
               src={newsItem.imageUrl} 
               alt={newsItem.title}
               className="w-full h-full object-cover"
               onError={(e) => {
                 const fallbackImages = [
-                  "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=400&fit=crop",
-                  "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&h=400&fit=crop",
-                  "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=400&fit=crop"
+                  "https://images.unsplash.com/photo-1514119412350-e174d90d280e?w=800&h=400&fit=crop",
+                  "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=800&h=400&fit=crop",
+                  "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&h=400&fit=crop"
                 ];
                 e.currentTarget.src = fallbackImages[Math.floor(Math.random() * fallbackImages.length)];
               }}
             />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
           </div>
           
           <div className="space-y-3">
@@ -62,7 +69,9 @@ const NewsDetailDialog = ({ open, onOpenChange, newsItem }: NewsDetailDialogProp
             <p className="text-gray-900 leading-relaxed">
               This exclusive update showcases the latest developments in the Indian classical arts scene. 
               Enthusiasts and practitioners alike are excited about this new development, which represents a 
-              significant milestone for the {newsItem.category.toLowerCase()} community.
+              significant milestone for the {newsItem.category.toLowerCase()} community. The growing digital 
+              presence and innovative approaches are helping preserve traditional art forms while making them 
+              accessible to global audiences.
             </p>
           </div>
         </div>
@@ -71,7 +80,7 @@ const NewsDetailDialog = ({ open, onOpenChange, newsItem }: NewsDetailDialogProp
           <Button 
             onClick={() => onOpenChange(false)}
             variant="outline"
-            className="border-orange-300 text-orange-700"
+            className="border-purple-300 text-purple-700 hover:bg-purple-100"
           >
             Close
           </Button>

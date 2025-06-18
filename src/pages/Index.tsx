@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { toast } from 'sonner';
-import { Pencil, Calendar, Music, Users, X } from 'lucide-react';
+import { Pencil, Calendar, Music, Users, X, Radio, Headphones, Volume2 } from 'lucide-react';
 import EditInterestsDialog from '@/components/EditInterestsDialog';
 import NewsDetailDialog from '@/components/NewsDetailDialog';
 
@@ -28,50 +28,44 @@ interface UserPreferences {
   preferredCategories: string[];
 }
 
-// Enhanced music and dance specific images with better keywords
-const getMusicDanceImage = (title: string, category: string) => {
-  const musicDanceImages = {
+// Musical instrument specific images for better relevance
+const getMusicalInstrumentImage = (title: string, category: string) => {
+  const instrumentImages = {
     'Classical Dance': [
-      "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=250&fit=crop&q=80", // Bharatanatyam dancer
-      "https://images.unsplash.com/photo-1583224964623-033ed52c6b3b?w=400&h=250&fit=crop&q=80", // Kathak performance
-      "https://images.unsplash.com/photo-1516280906200-bf71fe1b1e28?w=400&h=250&fit=crop&q=80", // Classical dance pose
-      "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=400&h=250&fit=crop&q=80", // Traditional dance
-      "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=250&fit=crop&q=80", // Indian classical dance
+      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop&q=80", // Classical instruments
+      "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=250&fit=crop&q=80", // Traditional instruments
+      "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=400&h=250&fit=crop&q=80", // Tabla
+      "https://images.unsplash.com/photo-1514119412350-e174d90d280e?w=400&h=250&fit=crop&q=80", // Sitar
     ],
     'Folk Dance': [
-      "https://images.unsplash.com/photo-1516280906200-bf71fe1b1e28?w=400&h=250&fit=crop&q=80", // Folk dance
-      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=250&fit=crop&q=80", // Traditional dance group
-      "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=400&h=250&fit=crop&q=80", // Cultural dance
-      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop&q=80", // Folk performance
+      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop&q=80", // Folk instruments
+      "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=250&fit=crop&q=80", // Traditional drums
+      "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=400&h=250&fit=crop&q=80", // Percussion
     ],
     'Bollywood': [
-      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop&q=80", // Music and dance
-      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=250&fit=crop&q=80", // Music production
-      "https://images.unsplash.com/photo-1516280906200-bf71fe1b1e28?w=400&h=250&fit=crop&q=80", // Dance performance
-      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=250&fit=crop&q=80", // Bollywood music
+      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop&q=80", // Modern instruments
+      "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=250&fit=crop&q=80", // Mixing instruments
+      "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=250&fit=crop&q=80", // Music production
     ],
     'Classical Music': [
-      "https://images.unsplash.com/photo-1514119412350-e174d90d280e?w=400&h=250&fit=crop&q=80", // Sitar player
-      "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=400&h=250&fit=crop&q=80", // Tabla drums
-      "https://images.unsplash.com/photo-1465821185615-20b3c2fbf41b?w=400&h=250&fit=crop&q=80", // Violin classical
+      "https://images.unsplash.com/photo-1514119412350-e174d90d280e?w=400&h=250&fit=crop&q=80", // Sitar
+      "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=400&h=250&fit=crop&q=80", // Tabla
+      "https://images.unsplash.com/photo-1465821185615-20b3c2fbf41b?w=400&h=250&fit=crop&q=80", // Violin
       "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=250&fit=crop&q=80", // Traditional instruments
-      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop&q=80", // Indian classical music
     ],
     'Folk Music': [
       "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=250&fit=crop&q=80", // Folk instruments
-      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop&q=80", // Music performance
-      "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=400&h=250&fit=crop&q=80", // Traditional music
-      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=250&fit=crop&q=80", // Folk music instruments
+      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop&q=80", // Traditional music
+      "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=400&h=250&fit=crop&q=80", // Drums
     ],
     'Contemporary': [
-      "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=250&fit=crop&q=80", // Contemporary dance
-      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=250&fit=crop&q=80", // Modern dance
-      "https://images.unsplash.com/photo-1516280906200-bf71fe1b1e28?w=400&h=250&fit=crop&q=80", // Contemporary performance
-      "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=400&h=250&fit=crop&q=80", // Modern fusion
+      "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=250&fit=crop&q=80", // Modern instruments
+      "https://images.unsplash.com/photo-1465821185615-20b3c2fbf41b?w=400&h=250&fit=crop&q=80", // Contemporary violin
+      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop&q=80", // Fusion instruments
     ]
   };
 
-  const images = musicDanceImages[category as keyof typeof musicDanceImages] || musicDanceImages['Classical Music'];
+  const images = instrumentImages[category as keyof typeof instrumentImages] || instrumentImages['Classical Music'];
   return images[Math.floor(Math.random() * images.length)];
 };
 
@@ -250,16 +244,22 @@ const Index = () => {
     try {
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       
-      const prompt = `Generate 6 latest and trending news updates about Indian dance and music in JSON format. Focus on real-time trends and current events. Each update should include:
-      - title: A compelling and current headline
-      - description: 2-3 sentences describing the update with specific details
+      const currentDate = new Date().toLocaleDateString('en-IN', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+      
+      const prompt = `Generate 6 latest and most current news updates about Indian dance and music happening RIGHT NOW in ${currentDate}. Focus on real-time, breaking news and recent developments. Each update should include:
+      - title: A compelling headline about CURRENT events (use words like "Today", "This Week", "Recently", "Latest")
+      - description: 2-3 sentences with specific recent details, dates, and current happenings
       - category: One of (Classical Dance, Folk Dance, Bollywood, Classical Music, Folk Music, Contemporary)
       
-      Focus on topics related to user interests: ${userPreferences.interests.join(', ')}, ${userPreferences.preferredCategories.join(', ')}.
+      Focus on user interests: ${userPreferences.interests.join(', ')}, ${userPreferences.preferredCategories.join(', ')}.
       
-      Include current trends like: recent performances, festivals, awards, new releases, cultural events, artist collaborations, digital platforms, social media trends, government initiatives, cultural preservation efforts, international recognition, and emerging artists.
+      Include CURRENT trends like: recent performances this week, ongoing festivals, new song releases, viral dance videos, artist announcements, concert bookings, award ceremonies, digital platform launches, social media trends, government cultural initiatives, international collaborations, emerging artist debuts, and breaking entertainment news.
       
-      Make the news diverse, authentic, and reflect the vibrant Indian arts scene. Return only valid JSON array format without any markdown formatting.`;
+      Make each news item feel like it happened TODAY or THIS WEEK. Include specific recent details and current relevance. Return only valid JSON array format without any markdown formatting.`;
 
       const result = await model.generateContent(prompt);
       const response = await result.response;
@@ -269,48 +269,48 @@ const Index = () => {
       const jsonMatch = text.match(/\[[\s\S]*\]/);
       if (jsonMatch) {
         const parsedNews = JSON.parse(jsonMatch[0]);
-        // Add relevant images to each news item
+        // Add musical instrument images to each news item
         const newsWithImages = parsedNews.map((item: NewsItem) => ({
           ...item,
-          imageUrl: getMusicDanceImage(item.title, item.category)
+          imageUrl: getMusicalInstrumentImage(item.title, item.category)
         }));
         setNewsItems(newsWithImages);
       } else {
-        // Enhanced fallback news items with better diversity
+        // Enhanced fallback with musical instruments focus
         const fallbackNews = [
           {
-            title: "Bharatanatyam Festival Celebrates Digital Renaissance",
-            description: "The annual Bharatanatyam festival in Chennai showcases how traditional dance is embracing digital platforms. Artists are using social media and virtual reality to reach global audiences while preserving ancient traditions.",
-            category: "Classical Dance"
-          },
-          {
-            title: "AR Rahman Collaborates with Folk Artists for New Album",
-            description: "Oscar-winning composer AR Rahman announces a groundbreaking collaboration with folk musicians from Rajasthan and Bengal. The album promises to blend traditional folk melodies with contemporary production techniques.",
-            category: "Folk Music"
-          },
-          {
-            title: "Young Kuchipudi Dancer Wins International Recognition",
-            description: "17-year-old Priya Sharma from Hyderabad wins the prestigious International Dance Competition in Paris. Her innovative interpretation of classical Kuchipudi has garnered attention from dance enthusiasts worldwide.",
-            category: "Classical Dance"
-          },
-          {
-            title: "Bollywood Music Streaming Reaches New Heights",
-            description: "Latest Bollywood soundtracks are breaking streaming records globally, with Indian music gaining unprecedented popularity on international platforms. The fusion of traditional and modern sounds is attracting diverse audiences.",
-            category: "Bollywood"
-          },
-          {
-            title: "Carnatic Music Goes Viral on Social Media",
-            description: "Young Carnatic musicians are using Instagram and TikTok to share their performances, making classical music accessible to younger generations. The trend is revitalizing interest in traditional South Indian music.",
+            title: "Today: Sitar Virtuoso Announces Digital Concert Series",
+            description: "Renowned sitarist launches an innovative online concert series featuring classical ragas. The weekly performances will stream live every Friday, showcasing traditional Hindustani music with modern presentation techniques.",
             category: "Classical Music"
           },
           {
-            title: "Contemporary Dance Fusion Gains Momentum",
-            description: "Indian choreographers are creating innovative fusion forms that blend classical dance with contemporary movements. These performances are being featured in international dance festivals and gaining critical acclaim.",
+            title: "This Week: Tabla Maestro's New Album Breaks Streaming Records",
+            description: "A fusion album combining traditional tabla rhythms with contemporary beats has garnered over 2 million streams in just three days. The innovative approach is attracting younger audiences to classical Indian percussion.",
+            category: "Classical Music"
+          },
+          {
+            title: "Latest: Bharatanatyam Performance Goes Viral on Social Media",
+            description: "A Chennai-based dancer's contemporary interpretation of classical Bharatanatyam has received 5 million views across platforms. The performance beautifully blends traditional mudras with modern storytelling techniques.",
+            category: "Classical Dance"
+          },
+          {
+            title: "Breaking: Bollywood Music Director Collaborates with Folk Artists",
+            description: "Today's announcement reveals an upcoming album featuring Rajasthani folk musicians collaborating with mainstream Bollywood composers. The project aims to preserve traditional melodies while creating contemporary appeal.",
+            category: "Bollywood"
+          },
+          {
+            title: "Recent: Veena Revival Movement Gains International Recognition",
+            description: "Young musicians worldwide are embracing the ancient veena, with online tutorials surging 300% this month. International music schools are now incorporating this classical Indian instrument into their curriculum.",
+            category: "Classical Music"
+          },
+          {
+            title: "Today: Contemporary Dance Festival Showcases Indian Fusion",
+            description: "The ongoing international dance festival in Mumbai is featuring innovative contemporary pieces that blend classical Indian forms with global dance styles. Tickets for remaining shows are selling out rapidly.",
             category: "Contemporary"
           }
         ].map(item => ({
           ...item,
-          imageUrl: getMusicDanceImage(item.title, item.category)
+          imageUrl: getMusicalInstrumentImage(item.title, item.category)
         }));
         setNewsItems(fallbackNews);
       }
@@ -378,16 +378,30 @@ const Index = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50 flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4 relative overflow-hidden">
+        {/* Musical Background Elements */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-20 left-20 text-6xl">🎵</div>
+          <div className="absolute top-40 right-32 text-4xl">🎶</div>
+          <div className="absolute bottom-32 left-16 text-5xl">🎼</div>
+          <div className="absolute bottom-20 right-20 text-6xl">🎹</div>
+          <div className="absolute top-60 left-1/2 text-3xl">🥁</div>
+        </div>
+        
+        <div className="w-full max-w-md relative z-10">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-orange-800 mb-2">🎭 Indra Sangeet Pulse</h1>
-            <p className="text-orange-600">Your gateway to Indian dance & music updates</p>
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Music className="h-8 w-8 text-purple-300" />
+              <h1 className="text-4xl font-bold text-white">Indra Sangeet Pulse</h1>
+              <Radio className="h-8 w-8 text-purple-300" />
+            </div>
+            <p className="text-purple-200">Your gateway to Indian dance & music updates</p>
           </div>
           
-          <Card className="shadow-xl border-orange-200">
+          <Card className="shadow-2xl border-purple-300 bg-white/95 backdrop-blur-sm">
             <CardHeader className="text-center">
-              <CardTitle className="text-2xl text-orange-800">
+              <CardTitle className="text-2xl text-purple-800 flex items-center justify-center gap-2">
+                <Headphones className="h-6 w-6" />
                 {isSignUp ? 'Create Account' : 'Welcome Back'}
               </CardTitle>
             </CardHeader>
@@ -397,26 +411,26 @@ const Index = () => {
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="border-orange-200 focus:border-orange-400"
+                className="border-purple-200 focus:border-purple-400"
               />
               <Input
                 type="password"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="border-orange-200 focus:border-orange-400"
+                className="border-purple-200 focus:border-purple-400"
               />
               <Button 
                 onClick={handleAuth} 
                 disabled={loading}
-                className="w-full bg-orange-600 hover:bg-orange-700"
+                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
               >
                 {loading ? 'Please wait...' : (isSignUp ? 'Sign Up' : 'Sign In')}
               </Button>
               <Button
                 variant="ghost"
                 onClick={() => setIsSignUp(!isSignUp)}
-                className="w-full text-orange-600 hover:text-orange-700"
+                className="w-full text-purple-600 hover:text-purple-700"
               >
                 {isSignUp ? 'Already have an account? Sign In' : 'Need an account? Sign Up'}
               </Button>
@@ -428,18 +442,24 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50">
-      {/* Header */}
-      <header className="bg-white shadow-md border-b-4 border-orange-500">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-orange-800">🎭 Indra Sangeet Pulse</h1>
-            <p className="text-orange-600">Welcome, {user.email}</p>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50">
+      {/* Enhanced Header with Musical Theme */}
+      <header className="bg-gradient-to-r from-purple-800 via-blue-800 to-indigo-800 shadow-2xl border-b-4 border-purple-500">
+        <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <Music className="h-8 w-8 text-purple-200" />
+            <div>
+              <h1 className="text-3xl font-bold text-white flex items-center gap-2">
+                Indra Sangeet Pulse
+                <Volume2 className="h-6 w-6 text-purple-200" />
+              </h1>
+              <p className="text-purple-200">Welcome, {user.email}</p>
+            </div>
           </div>
           <Button 
             onClick={handleSignOut}
             variant="outline"
-            className="border-orange-300 text-orange-700 hover:bg-orange-100"
+            className="border-purple-300 text-purple-200 hover:bg-purple-700 hover:text-white"
           >
             Sign Out
           </Button>
@@ -448,22 +468,27 @@ const Index = () => {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         <Tabs defaultValue="updates" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 bg-orange-100">
-            <TabsTrigger value="updates" className="data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+          <TabsList className="grid w-full grid-cols-2 bg-gradient-to-r from-purple-100 to-blue-100">
+            <TabsTrigger value="updates" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-blue-600 data-[state=active]:text-white">
+              <Radio className="h-4 w-4 mr-2" />
               Latest Updates
             </TabsTrigger>
-            <TabsTrigger value="preferences" className="data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsTrigger value="preferences" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-blue-600 data-[state=active]:text-white">
+              <Headphones className="h-4 w-4 mr-2" />
               My Interests
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="updates" className="space-y-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-orange-800">Latest in Dance & Music</h2>
+              <h2 className="text-2xl font-bold text-purple-800 flex items-center gap-2">
+                <Music className="h-6 w-6" />
+                Latest in Dance & Music
+              </h2>
               <Button 
                 onClick={fetchLatestUpdates}
                 disabled={loadingNews}
-                className="bg-orange-600 hover:bg-orange-700"
+                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
               >
                 {loadingNews ? 'Refreshing...' : 'Refresh Updates'}
               </Button>
@@ -472,12 +497,12 @@ const Index = () => {
             {loadingNews ? (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <Card key={i} className="animate-pulse">
-                    <div className="h-48 bg-gray-200 rounded-t-lg"></div>
+                  <Card key={i} className="animate-pulse border-purple-200">
+                    <div className="h-48 bg-gradient-to-r from-purple-200 to-blue-200 rounded-t-lg"></div>
                     <CardContent className="p-4 space-y-2">
-                      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                      <div className="h-3 bg-gray-200 rounded w-full"></div>
-                      <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                      <div className="h-4 bg-purple-200 rounded w-3/4"></div>
+                      <div className="h-3 bg-purple-200 rounded w-full"></div>
+                      <div className="h-3 bg-purple-200 rounded w-2/3"></div>
                     </CardContent>
                   </Card>
                 ))}
@@ -488,33 +513,34 @@ const Index = () => {
                   <HoverCard key={index}>
                     <HoverCardTrigger asChild>
                       <Card 
-                        className="overflow-hidden hover:shadow-xl transition-all duration-300 border-orange-200 cursor-pointer transform hover:scale-105"
+                        className="overflow-hidden hover:shadow-2xl transition-all duration-300 border-purple-200 cursor-pointer transform hover:scale-105 hover:border-purple-400"
                         onClick={() => openNewsDetail(item)}
                       >
-                        <div className="h-48 overflow-hidden">
+                        <div className="h-48 overflow-hidden relative">
                           <img 
                             src={item.imageUrl} 
                             alt={item.title}
                             className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
                             onError={(e) => {
-                              e.currentTarget.src = getMusicDanceImage(item.title, item.category);
+                              e.currentTarget.src = getMusicalInstrumentImage(item.title, item.category);
                             }}
                           />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                         </div>
                         <CardContent className="p-4">
                           <div className="flex items-center gap-2 mb-2">
-                            <Badge variant="secondary" className="bg-orange-100 text-orange-800">
+                            <Badge variant="secondary" className="bg-gradient-to-r from-purple-100 to-blue-100 text-purple-800 border-purple-300">
                               {item.category}
                             </Badge>
                           </div>
-                          <h3 className="font-bold text-lg mb-2 text-orange-900 line-clamp-2">{item.title}</h3>
+                          <h3 className="font-bold text-lg mb-2 text-purple-900 line-clamp-2">{item.title}</h3>
                           <p className="text-gray-700 text-sm leading-relaxed line-clamp-3">{item.description}</p>
                           
                           <div className="flex items-center justify-between mt-3">
                             <Button 
                               variant="ghost" 
                               size="sm" 
-                              className="text-orange-600 hover:text-orange-800 p-0"
+                              className="text-purple-600 hover:text-purple-800 p-0"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 openNewsDetail(item);
@@ -526,11 +552,11 @@ const Index = () => {
                         </CardContent>
                       </Card>
                     </HoverCardTrigger>
-                    <HoverCardContent className="w-80 bg-white border-orange-200">
+                    <HoverCardContent className="w-80 bg-white border-purple-200 shadow-xl">
                       <div className="flex flex-col space-y-2">
                         <div className="flex items-center space-x-2">
-                          <Music className="h-4 w-4 text-orange-600" />
-                          <span className="font-semibold text-orange-800">{item.category}</span>
+                          <Music className="h-4 w-4 text-purple-600" />
+                          <span className="font-semibold text-purple-800">{item.category}</span>
                         </div>
                         <div className="flex items-center space-x-2 text-sm text-gray-500">
                           <Calendar className="h-4 w-4" />
@@ -550,28 +576,34 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="preferences" className="space-y-6">
-            <Card className="border-orange-200">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-orange-800">Your Interests</CardTitle>
+            <Card className="border-purple-200 shadow-lg">
+              <CardHeader className="flex flex-row items-center justify-between bg-gradient-to-r from-purple-50 to-blue-50">
+                <CardTitle className="text-purple-800 flex items-center gap-2">
+                  <Headphones className="h-5 w-5" />
+                  Your Musical Interests
+                </CardTitle>
                 <Button 
                   onClick={() => setIsEditInterestsOpen(true)}
                   variant="outline"
                   size="sm"
-                  className="border-orange-300 text-orange-700 hover:bg-orange-100 flex items-center gap-1"
+                  className="border-purple-300 text-purple-700 hover:bg-purple-100 flex items-center gap-1"
                 >
                   <Pencil className="h-4 w-4" /> Edit Interests
                 </Button>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 p-6">
                 <div>
-                  <h4 className="font-semibold mb-2 text-orange-700">Current Interests:</h4>
+                  <h4 className="font-semibold mb-3 text-purple-700 flex items-center gap-2">
+                    <Music className="h-4 w-4" />
+                    Current Interests:
+                  </h4>
                   <div className="flex flex-wrap gap-2">
                     {userPreferences.interests.map((interest, index) => (
-                      <Badge key={index} className="bg-orange-600 text-white flex items-center gap-1 pr-1">
+                      <Badge key={index} className="bg-gradient-to-r from-purple-600 to-blue-600 text-white flex items-center gap-1 pr-1 hover:from-purple-700 hover:to-blue-700 transition-all">
                         {interest}
                         <button 
                           onClick={() => removeInterest(interest)}
-                          className="ml-1 hover:bg-orange-700 rounded-full p-0.5 transition-colors"
+                          className="ml-1 hover:bg-purple-700 rounded-full p-0.5 transition-colors"
                           title={`Remove ${interest}`}
                         >
                           <X size={12} />
@@ -585,10 +617,13 @@ const Index = () => {
                 </div>
                 
                 <div>
-                  <h4 className="font-semibold mb-2 text-orange-700">Preferred Categories:</h4>
+                  <h4 className="font-semibold mb-3 text-purple-700 flex items-center gap-2">
+                    <Radio className="h-4 w-4" />
+                    Preferred Categories:
+                  </h4>
                   <div className="flex flex-wrap gap-2">
                     {userPreferences.preferredCategories.map((category, index) => (
-                      <Badge key={index} variant="outline" className="border-orange-300 text-orange-700">
+                      <Badge key={index} variant="outline" className="border-purple-300 text-purple-700 hover:bg-purple-50">
                         {category}
                       </Badge>
                     ))}
@@ -596,7 +631,10 @@ const Index = () => {
                 </div>
 
                 <div>
-                  <h4 className="font-semibold mb-2 text-orange-700">Quick Add Interests:</h4>
+                  <h4 className="font-semibold mb-3 text-purple-700 flex items-center gap-2">
+                    <Volume2 className="h-4 w-4" />
+                    Quick Add Interests:
+                  </h4>
                   <div className="flex flex-wrap gap-2">
                     {[
                       'Odissi', 'Kuchipudi', 'Manipuri', 'Mohiniyattam', 'Punjabi Folk', 'Qawwali',
@@ -613,7 +651,7 @@ const Index = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => updatePreferences(interest)}
-                        className="border-orange-300 text-orange-700 hover:bg-orange-100"
+                        className="border-purple-300 text-purple-700 hover:bg-purple-100 hover:border-purple-400"
                         disabled={userPreferences.interests.includes(interest)}
                       >
                         + {interest}
