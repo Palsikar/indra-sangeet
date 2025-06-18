@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { toast } from 'sonner';
-import { Pencil, Calendar, Music, Users, X, Radio, Headphones, Volume2 } from 'lucide-react';
+import { Pencil, Calendar, Music, Users, X, Radio, Headphones, Volume2, ExternalLink, Guitar, Mic } from 'lucide-react';
 import EditInterestsDialog from '@/components/EditInterestsDialog';
 import NewsDetailDialog from '@/components/NewsDetailDialog';
 
@@ -439,26 +439,49 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50">
-      {/* Enhanced Header with Musical Theme */}
+      {/* Enhanced Header with Musical Theme and Navigation */}
       <header className="bg-gradient-to-r from-purple-800 via-blue-800 to-indigo-800 shadow-2xl border-b-4 border-purple-500">
-        <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <Music className="h-8 w-8 text-purple-200" />
-            <div>
-              <h1 className="text-3xl font-bold text-white flex items-center gap-2">
-                Indra Sangeet Pulse
-                <Volume2 className="h-6 w-6 text-purple-200" />
-              </h1>
-              <p className="text-purple-200">Welcome, {user.email}</p>
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          {/* Top row with logo and sign out */}
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex items-center gap-3">
+              <Music className="h-8 w-8 text-purple-200" />
+              <div>
+                <h1 className="text-3xl font-bold text-white flex items-center gap-2">
+                  Indra Sangeet Pulse
+                  <Volume2 className="h-6 w-6 text-purple-200" />
+                </h1>
+                <p className="text-purple-200">Welcome, {user.email}</p>
+              </div>
             </div>
+            <Button 
+              onClick={handleSignOut}
+              variant="outline"
+              className="border-purple-300 text-purple-200 hover:bg-purple-700 hover:text-white"
+            >
+              Sign Out
+            </Button>
           </div>
-          <Button 
-            onClick={handleSignOut}
-            variant="outline"
-            className="border-purple-300 text-purple-200 hover:bg-purple-700 hover:text-white"
-          >
-            Sign Out
-          </Button>
+          
+          {/* Navigation buttons */}
+          <div className="flex gap-4 justify-center">
+            <Button
+              onClick={() => window.open('https://palsikar.github.io/dance-and-music/minisrd/', '_blank')}
+              className="bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white flex items-center gap-2"
+            >
+              <Guitar className="h-4 w-4" />
+              Dance & Music Hub
+              <ExternalLink className="h-4 w-4" />
+            </Button>
+            <Button
+              onClick={() => window.open('https://v0-musical-instrument-classifier.vercel.app/', '_blank')}
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white flex items-center gap-2"
+            >
+              <Mic className="h-4 w-4" />
+              Instrument Classifier
+              <ExternalLink className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </header>
 
