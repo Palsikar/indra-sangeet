@@ -28,45 +28,29 @@ interface UserPreferences {
   preferredCategories: string[];
 }
 
-// Musical instrument specific images for better relevance
-const getMusicalInstrumentImage = (title: string, category: string) => {
-  const instrumentImages = {
-    'Classical Dance': [
-      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop&q=80", // Classical instruments
-      "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=250&fit=crop&q=80", // Traditional instruments
-      "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=400&h=250&fit=crop&q=80", // Tabla
-      "https://images.unsplash.com/photo-1514119412350-e174d90d280e?w=400&h=250&fit=crop&q=80", // Sitar
-    ],
-    'Folk Dance': [
-      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop&q=80", // Folk instruments
-      "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=250&fit=crop&q=80", // Traditional drums
-      "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=400&h=250&fit=crop&q=80", // Percussion
-    ],
-    'Bollywood': [
-      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop&q=80", // Modern instruments
-      "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=250&fit=crop&q=80", // Mixing instruments
-      "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=250&fit=crop&q=80", // Music production
-    ],
-    'Classical Music': [
-      "https://images.unsplash.com/photo-1514119412350-e174d90d280e?w=400&h=250&fit=crop&q=80", // Sitar
-      "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=400&h=250&fit=crop&q=80", // Tabla
-      "https://images.unsplash.com/photo-1465821185615-20b3c2fbf41b?w=400&h=250&fit=crop&q=80", // Violin
-      "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=250&fit=crop&q=80", // Traditional instruments
-    ],
-    'Folk Music': [
-      "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=250&fit=crop&q=80", // Folk instruments
-      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop&q=80", // Traditional music
-      "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=400&h=250&fit=crop&q=80", // Drums
-    ],
-    'Contemporary': [
-      "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=250&fit=crop&q=80", // Modern instruments
-      "https://images.unsplash.com/photo-1465821185615-20b3c2fbf41b?w=400&h=250&fit=crop&q=80", // Contemporary violin
-      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop&q=80", // Fusion instruments
-    ]
-  };
+// Your uploaded music and dance images
+const musicDanceImages = [
+  "/lovable-uploads/4dd0281a-53f4-490a-bcf8-33c26dd339f1.png", // Musical notes with dancers silhouette
+  "/lovable-uploads/2d9d9ca2-8713-4b5a-97f4-b135fbc6b16c.png", // Children singing and dancing
+  "/lovable-uploads/b3c07727-72aa-4c1c-879e-28c09d1e0d63.png", // Colorful dancers with musical notes
+  "/lovable-uploads/5b1945df-210e-4104-88f1-e415887365f4.png", // Music and dance icons
+  "/lovable-uploads/2f32aed4-6d95-4582-b88f-850cd9e5eea6.png", // Dancers with equalizer background
+  "/lovable-uploads/094e116c-92a5-4c2c-a754-36a7ce7ce73c.png", // Joyful dancers with musical staff
+];
 
-  const images = instrumentImages[category as keyof typeof instrumentImages] || instrumentImages['Classical Music'];
-  return images[Math.floor(Math.random() * images.length)];
+// Function to get unique images for news items
+const getUniqueImageForNews = (usedImages: Set<string>) => {
+  const availableImages = musicDanceImages.filter(img => !usedImages.has(img));
+  
+  if (availableImages.length === 0) {
+    // If all images are used, reset and start over
+    usedImages.clear();
+    return musicDanceImages[0];
+  }
+  
+  const selectedImage = availableImages[Math.floor(Math.random() * availableImages.length)];
+  usedImages.add(selectedImage);
+  return selectedImage;
 };
 
 const Index = () => {
@@ -250,16 +234,25 @@ const Index = () => {
         day: 'numeric' 
       });
       
-      const prompt = `Generate 6 latest and most current news updates about Indian dance and music happening RIGHT NOW in ${currentDate}. Focus on real-time, breaking news and recent developments. Each update should include:
-      - title: A compelling headline about CURRENT events (use words like "Today", "This Week", "Recently", "Latest")
-      - description: 2-3 sentences with specific recent details, dates, and current happenings
+      const prompt = `Search Google and find 6 real, latest, and most current news articles about Indian dance and music happening RIGHT NOW in ${currentDate}. Use actual web search capabilities to find breaking news, recent events, and current developments. Each update should include:
+      - title: A compelling headline about CURRENT events from real news sources
+      - description: 2-3 sentences with specific recent details, dates, and current happenings from actual news articles
       - category: One of (Classical Dance, Folk Dance, Bollywood, Classical Music, Folk Music, Contemporary)
       
       Focus on user interests: ${userPreferences.interests.join(', ')}, ${userPreferences.preferredCategories.join(', ')}.
       
-      Include CURRENT trends like: recent performances this week, ongoing festivals, new song releases, viral dance videos, artist announcements, concert bookings, award ceremonies, digital platform launches, social media trends, government cultural initiatives, international collaborations, emerging artist debuts, and breaking entertainment news.
+      Search for CURRENT trends like: recent performances this week, ongoing festivals, new song releases, viral dance videos, artist announcements, concert bookings, award ceremonies, digital platform launches, social media trends, government cultural initiatives, international collaborations, emerging artist debuts, breaking entertainment news, recent album launches, dance competitions, music festivals, cultural events.
       
-      Make each news item feel like it happened TODAY or THIS WEEK. Include specific recent details and current relevance. Return only valid JSON array format without any markdown formatting.`;
+      Make sure each news item is from a real, verifiable source and happened TODAY, THIS WEEK, or THIS MONTH. Include specific recent details and current relevance from actual news articles found through web search.
+      
+      Return only valid JSON array format without any markdown formatting:
+      [
+        {
+          "title": "Real news headline from actual source",
+          "description": "Real description from actual news article with specific details",
+          "category": "One of the specified categories"
+        }
+      ]`;
 
       const result = await model.generateContent(prompt);
       const response = await result.response;
@@ -269,14 +262,17 @@ const Index = () => {
       const jsonMatch = text.match(/\[[\s\S]*\]/);
       if (jsonMatch) {
         const parsedNews = JSON.parse(jsonMatch[0]);
-        // Add musical instrument images to each news item
+        const usedImages = new Set<string>();
+        
+        // Add unique images to each news item
         const newsWithImages = parsedNews.map((item: NewsItem) => ({
           ...item,
-          imageUrl: getMusicalInstrumentImage(item.title, item.category)
+          imageUrl: getUniqueImageForNews(usedImages)
         }));
         setNewsItems(newsWithImages);
       } else {
-        // Enhanced fallback with musical instruments focus
+        // Enhanced fallback with unique images
+        const usedImages = new Set<string>();
         const fallbackNews = [
           {
             title: "Today: Sitar Virtuoso Announces Digital Concert Series",
@@ -310,7 +306,7 @@ const Index = () => {
           }
         ].map(item => ({
           ...item,
-          imageUrl: getMusicalInstrumentImage(item.title, item.category)
+          imageUrl: getUniqueImageForNews(usedImages)
         }));
         setNewsItems(fallbackNews);
       }
@@ -521,9 +517,6 @@ const Index = () => {
                             src={item.imageUrl} 
                             alt={item.title}
                             className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                            onError={(e) => {
-                              e.currentTarget.src = getMusicalInstrumentImage(item.title, item.category);
-                            }}
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                         </div>
