@@ -3,15 +3,13 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, ExternalLink } from "lucide-react";
+import { Calendar } from "lucide-react";
 
 interface NewsItem {
   title: string;
   description: string;
   category: string;
   imageUrl: string;
-  source: string;
-  sourceUrl?: string;
 }
 
 interface NewsDetailDialogProps {
@@ -22,12 +20,6 @@ interface NewsDetailDialogProps {
 
 const NewsDetailDialog = ({ open, onOpenChange, newsItem }: NewsDetailDialogProps) => {
   if (!newsItem) return null;
-
-  const handleSourceClick = () => {
-    if (newsItem.sourceUrl) {
-      window.open(newsItem.sourceUrl, '_blank');
-    }
-  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -72,22 +64,6 @@ const NewsDetailDialog = ({ open, onOpenChange, newsItem }: NewsDetailDialogProp
               Enthusiasts and practitioners alike are excited about this new development, which represents a 
               significant milestone for the {newsItem.category.toLowerCase()} community.
             </p>
-            
-            <div className="flex items-center justify-between pt-4 border-t">
-              <div className="italic text-sm text-gray-500">
-                Source: {newsItem.source}
-              </div>
-              
-              {newsItem.sourceUrl && (
-                <Button 
-                  onClick={handleSourceClick}
-                  className="bg-orange-600 hover:bg-orange-700 flex items-center gap-2"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  Read Full Article
-                </Button>
-              )}
-            </div>
           </div>
         </div>
         

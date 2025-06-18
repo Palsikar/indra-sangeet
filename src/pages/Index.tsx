@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { toast } from 'sonner';
-import { Pencil, ExternalLink, Calendar, Music, Users, X } from 'lucide-react';
+import { Pencil, Calendar, Music, Users, X } from 'lucide-react';
 import EditInterestsDialog from '@/components/EditInterestsDialog';
 import NewsDetailDialog from '@/components/NewsDetailDialog';
 
@@ -21,8 +21,6 @@ interface NewsItem {
   description: string;
   category: string;
   imageUrl: string;
-  source: string;
-  sourceUrl?: string;
 }
 
 interface UserPreferences {
@@ -30,40 +28,46 @@ interface UserPreferences {
   preferredCategories: string[];
 }
 
-// Music and dance specific images
+// Enhanced music and dance specific images with better keywords
 const getMusicDanceImage = (title: string, category: string) => {
   const musicDanceImages = {
     'Classical Dance': [
-      "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=250&fit=crop", // Bharatanatyam dancer
-      "https://images.unsplash.com/photo-1583224964623-033ed52c6b3b?w=400&h=250&fit=crop", // Kathak performance
-      "https://images.unsplash.com/photo-1516280906200-bf71fe1b1e28?w=400&h=250&fit=crop", // Classical dance pose
-      "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=400&h=250&fit=crop", // Traditional dance
+      "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=250&fit=crop&q=80", // Bharatanatyam dancer
+      "https://images.unsplash.com/photo-1583224964623-033ed52c6b3b?w=400&h=250&fit=crop&q=80", // Kathak performance
+      "https://images.unsplash.com/photo-1516280906200-bf71fe1b1e28?w=400&h=250&fit=crop&q=80", // Classical dance pose
+      "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=400&h=250&fit=crop&q=80", // Traditional dance
+      "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=250&fit=crop&q=80", // Indian classical dance
     ],
     'Folk Dance': [
-      "https://images.unsplash.com/photo-1516280906200-bf71fe1b1e28?w=400&h=250&fit=crop", // Folk dance
-      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=250&fit=crop", // Traditional dance group
-      "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=400&h=250&fit=crop", // Cultural dance
+      "https://images.unsplash.com/photo-1516280906200-bf71fe1b1e28?w=400&h=250&fit=crop&q=80", // Folk dance
+      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=250&fit=crop&q=80", // Traditional dance group
+      "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=400&h=250&fit=crop&q=80", // Cultural dance
+      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop&q=80", // Folk performance
     ],
     'Bollywood': [
-      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop", // Music and dance
-      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=250&fit=crop", // Music production
-      "https://images.unsplash.com/photo-1516280906200-bf71fe1b1e28?w=400&h=250&fit=crop", // Dance performance
+      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop&q=80", // Music and dance
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=250&fit=crop&q=80", // Music production
+      "https://images.unsplash.com/photo-1516280906200-bf71fe1b1e28?w=400&h=250&fit=crop&q=80", // Dance performance
+      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=250&fit=crop&q=80", // Bollywood music
     ],
     'Classical Music': [
-      "https://images.unsplash.com/photo-1514119412350-e174d90d280e?w=400&h=250&fit=crop", // Sitar player
-      "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=400&h=250&fit=crop", // Tabla drums
-      "https://images.unsplash.com/photo-1465821185615-20b3c2fbf41b?w=400&h=250&fit=crop", // Violin classical
-      "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=250&fit=crop", // Traditional instruments
+      "https://images.unsplash.com/photo-1514119412350-e174d90d280e?w=400&h=250&fit=crop&q=80", // Sitar player
+      "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=400&h=250&fit=crop&q=80", // Tabla drums
+      "https://images.unsplash.com/photo-1465821185615-20b3c2fbf41b?w=400&h=250&fit=crop&q=80", // Violin classical
+      "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=250&fit=crop&q=80", // Traditional instruments
+      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop&q=80", // Indian classical music
     ],
     'Folk Music': [
-      "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=250&fit=crop", // Folk instruments
-      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop", // Music performance
-      "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=400&h=250&fit=crop", // Traditional music
+      "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=250&fit=crop&q=80", // Folk instruments
+      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop&q=80", // Music performance
+      "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=400&h=250&fit=crop&q=80", // Traditional music
+      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=250&fit=crop&q=80", // Folk music instruments
     ],
     'Contemporary': [
-      "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=250&fit=crop", // Contemporary dance
-      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=250&fit=crop", // Modern dance
-      "https://images.unsplash.com/photo-1516280906200-bf71fe1b1e28?w=400&h=250&fit=crop", // Contemporary performance
+      "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=250&fit=crop&q=80", // Contemporary dance
+      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=250&fit=crop&q=80", // Modern dance
+      "https://images.unsplash.com/photo-1516280906200-bf71fe1b1e28?w=400&h=250&fit=crop&q=80", // Contemporary performance
+      "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=400&h=250&fit=crop&q=80", // Modern fusion
     ]
   };
 
@@ -246,17 +250,16 @@ const Index = () => {
     try {
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       
-      const prompt = `Generate 6 latest news updates about Indian dance and music in JSON format. Each update should include:
-      - title: A compelling headline
-      - description: 2-3 sentences describing the update
+      const prompt = `Generate 6 latest and trending news updates about Indian dance and music in JSON format. Focus on real-time trends and current events. Each update should include:
+      - title: A compelling and current headline
+      - description: 2-3 sentences describing the update with specific details
       - category: One of (Classical Dance, Folk Dance, Bollywood, Classical Music, Folk Music, Contemporary)
-      - imageUrl: Use placeholder images from unsplash with relevant keywords
-      - source: A credible source name
-      - sourceUrl: A realistic URL to the source (you can use placeholder URLs like https://example-news-source.com/article-slug)
       
-      Focus on topics like: ${userPreferences.interests.join(', ')}, ${userPreferences.preferredCategories.join(', ')}, recent performances, festivals, awards, new releases, cultural events.
+      Focus on topics related to user interests: ${userPreferences.interests.join(', ')}, ${userPreferences.preferredCategories.join(', ')}.
       
-      Make the news diverse and include current trends in Indian arts. Return only valid JSON array format.`;
+      Include current trends like: recent performances, festivals, awards, new releases, cultural events, artist collaborations, digital platforms, social media trends, government initiatives, cultural preservation efforts, international recognition, and emerging artists.
+      
+      Make the news diverse, authentic, and reflect the vibrant Indian arts scene. Return only valid JSON array format without any markdown formatting.`;
 
       const result = await model.generateContent(prompt);
       const response = await result.response;
@@ -269,54 +272,41 @@ const Index = () => {
         // Add relevant images to each news item
         const newsWithImages = parsedNews.map((item: NewsItem) => ({
           ...item,
-          imageUrl: getMusicDanceImage(item.title, item.category),
-          sourceUrl: item.sourceUrl || `https://example-news.com/${item.title.toLowerCase().replace(/\s+/g, '-')}`
+          imageUrl: getMusicDanceImage(item.title, item.category)
         }));
         setNewsItems(newsWithImages);
       } else {
-        // Fallback news items with relevant images and source URLs
+        // Enhanced fallback news items with better diversity
         const fallbackNews = [
           {
-            title: "Bharatanatyam Festival Returns to Chennai",
-            description: "The annual Bharatanatyam festival showcases traditional and contemporary performances by renowned artists from across India.",
-            category: "Classical Dance",
-            source: "The Hindu",
-            sourceUrl: "https://thehindu.com/bharatanatyam-festival-2024"
+            title: "Bharatanatyam Festival Celebrates Digital Renaissance",
+            description: "The annual Bharatanatyam festival in Chennai showcases how traditional dance is embracing digital platforms. Artists are using social media and virtual reality to reach global audiences while preserving ancient traditions.",
+            category: "Classical Dance"
           },
           {
-            title: "New Bollywood Album Breaks Streaming Records",
-            description: "Latest soundtrack featuring fusion of classical and modern elements reaches 10 million streams in first week.",
-            category: "Bollywood",
-            source: "Bollywood Hungama",
-            sourceUrl: "https://bollywoodhungama.com/new-album-streaming-records"
+            title: "AR Rahman Collaborates with Folk Artists for New Album",
+            description: "Oscar-winning composer AR Rahman announces a groundbreaking collaboration with folk musicians from Rajasthan and Bengal. The album promises to blend traditional folk melodies with contemporary production techniques.",
+            category: "Folk Music"
           },
           {
-            title: "Kathak Master Class Series Announced",
-            description: "International Kathak dancers to conduct virtual workshops for students worldwide this summer.",
-            category: "Classical Dance",
-            source: "Dance India",
-            sourceUrl: "https://danceindia.com/kathak-masterclass-2024"
+            title: "Young Kuchipudi Dancer Wins International Recognition",
+            description: "17-year-old Priya Sharma from Hyderabad wins the prestigious International Dance Competition in Paris. Her innovative interpretation of classical Kuchipudi has garnered attention from dance enthusiasts worldwide.",
+            category: "Classical Dance"
           },
           {
-            title: "Carnatic Music Festival Celebrates 50th Anniversary",
-            description: "The prestigious festival will feature legendary performers and emerging talents from across South India.",
-            category: "Classical Music",
-            source: "Music Today",
-            sourceUrl: "https://musictoday.com/carnatic-festival-50th"
+            title: "Bollywood Music Streaming Reaches New Heights",
+            description: "Latest Bollywood soundtracks are breaking streaming records globally, with Indian music gaining unprecedented popularity on international platforms. The fusion of traditional and modern sounds is attracting diverse audiences.",
+            category: "Bollywood"
           },
           {
-            title: "National Folk Dance Competition Announces New Categories",
-            description: "This year's competition will include regional folk styles from North-East India for the first time.",
-            category: "Folk Dance",
-            source: "Cultural Times",
-            sourceUrl: "https://culturaltimes.com/folk-dance-competition-2024"
+            title: "Carnatic Music Goes Viral on Social Media",
+            description: "Young Carnatic musicians are using Instagram and TikTok to share their performances, making classical music accessible to younger generations. The trend is revitalizing interest in traditional South Indian music.",
+            category: "Classical Music"
           },
           {
-            title: "Documentary on Hindustani Classical Masters Released",
-            description: "The critically acclaimed film explores the lives and contributions of legendary Hindustani Classical musicians.",
-            category: "Classical Music",
-            source: "Film Today",
-            sourceUrl: "https://filmtoday.com/hindustani-masters-documentary"
+            title: "Contemporary Dance Fusion Gains Momentum",
+            description: "Indian choreographers are creating innovative fusion forms that blend classical dance with contemporary movements. These performances are being featured in international dance festivals and gaining critical acclaim.",
+            category: "Contemporary"
           }
         ].map(item => ({
           ...item,
@@ -516,7 +506,6 @@ const Index = () => {
                             <Badge variant="secondary" className="bg-orange-100 text-orange-800">
                               {item.category}
                             </Badge>
-                            <span className="text-sm text-gray-500">{item.source}</span>
                           </div>
                           <h3 className="font-bold text-lg mb-2 text-orange-900 line-clamp-2">{item.title}</h3>
                           <p className="text-gray-700 text-sm leading-relaxed line-clamp-3">{item.description}</p>
@@ -525,26 +514,13 @@ const Index = () => {
                             <Button 
                               variant="ghost" 
                               size="sm" 
-                              className="text-orange-600 hover:text-orange-800 p-0 flex items-center"
+                              className="text-orange-600 hover:text-orange-800 p-0"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 openNewsDetail(item);
                               }}
                             >
-                              Read more <ExternalLink className="ml-1 h-4 w-4" />
-                            </Button>
-                            
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="border-orange-300 text-orange-700 hover:bg-orange-100"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                window.open(item.sourceUrl, '_blank');
-                              }}
-                            >
-                              <ExternalLink className="h-4 w-4 mr-1" />
-                              Source
+                              Read more
                             </Button>
                           </div>
                         </CardContent>
@@ -562,7 +538,7 @@ const Index = () => {
                         </div>
                         <div className="flex items-center space-x-2 text-sm text-gray-500">
                           <Users className="h-4 w-4" />
-                          <span>Source: {item.source}</span>
+                          <span>Indra Sangeet Pulse</span>
                         </div>
                         <p className="text-sm text-gray-700 mt-2">{item.description}</p>
                       </div>
