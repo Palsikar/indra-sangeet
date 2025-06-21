@@ -53,6 +53,84 @@ const getUniqueImageForNews = (usedImages: Set<string>) => {
   return selectedImage;
 };
 
+// Enhanced fallback news based on user interests
+const generateInterestBasedNews = (interests: string[], categories: string[]) => {
+  const usedImages = new Set<string>();
+  
+  const newsTemplates = [
+    {
+      interests: ['Bharatanatyam', 'Classical Dance', 'Odissi', 'Kuchipudi'],
+      title: "Classical Dance Festival Showcases Traditional Excellence",
+      description: "A grand classical dance festival featuring Bharatanatyam, Odissi, and Kuchipudi performances is captivating audiences this week. Renowned dancers from across India are presenting traditional pieces with contemporary interpretations.",
+      category: "Classical Dance"
+    },
+    {
+      interests: ['Hindustani Classical', 'Carnatic Music', 'Sitar', 'Tabla'],
+      title: "Classical Music Concert Series Launches This Month",
+      description: "Master musicians are presenting a series of classical music concerts featuring sitar, tabla, and vocal performances. The events are drawing music enthusiasts from around the world to experience authentic Indian classical traditions.",
+      category: "Classical Music"
+    },
+    {
+      interests: ['Folk Dance', 'Regional Folk Dances', 'Garba', 'Bhangra'],
+      title: "Folk Dance Competition Celebrates Regional Diversity",
+      description: "A vibrant folk dance competition is showcasing the rich diversity of Indian regional dances. Participants are presenting traditional Garba, Bhangra, and other folk forms, celebrating cultural heritage.",
+      category: "Folk Dance"
+    },
+    {
+      interests: ['Bollywood', 'Contemporary', 'Item Numbers'],
+      title: "Bollywood Dance Workshop Series Gains Popularity",
+      description: "Contemporary Bollywood dance workshops are trending this month, teaching modern choreography techniques. The sessions blend traditional Indian dance with contemporary styles, attracting dancers of all levels.",
+      category: "Bollywood"
+    },
+    {
+      interests: ['Kathak', 'Manipuri', 'Mohiniyattam'],
+      title: "Traditional Dance Forms Get Digital Spotlight",
+      description: "Classical dance forms like Kathak, Manipuri, and Mohiniyattam are gaining new audiences through digital platforms. Online performances are helping preserve these art forms while reaching global viewers.",
+      category: "Classical Dance"
+    },
+    {
+      interests: ['Veena', 'Flute', 'Violin', 'Harmonium'],
+      title: "Instrumental Music Renaissance Captivates Audiences",
+      description: "Traditional Indian instruments are experiencing a renaissance with young musicians taking up veena, flute, and violin. Contemporary compositions are breathing new life into classical instrumental music.",
+      category: "Classical Music"
+    }
+  ];
+
+  // Filter templates based on user interests and categories
+  const relevantNews = newsTemplates.filter(template => 
+    template.interests.some(interest => 
+      interests.some(userInterest => 
+        userInterest.toLowerCase().includes(interest.toLowerCase()) ||
+        interest.toLowerCase().includes(userInterest.toLowerCase())
+      )
+    ) || categories.includes(template.category)
+  );
+
+  // If no relevant news found, use all templates
+  const selectedNews = relevantNews.length > 0 ? relevantNews : newsTemplates;
+
+  // Add additional generic news to reach 6 items
+  const additionalNews = [
+    {
+      title: "Digital Revolution Transforms Indian Performing Arts",
+      description: "Technology is revolutionizing how Indian dance and music are taught, performed, and preserved. Virtual reality experiences and AI-powered learning tools are making traditional arts more accessible to modern audiences.",
+      category: "Contemporary"
+    },
+    {
+      title: "International Collaboration Brings Indian Arts to Global Stage",
+      description: "Indian artists are collaborating with international performers to create fusion works that bridge cultural boundaries. These collaborations are introducing traditional Indian arts to new audiences worldwide.",
+      category: "Contemporary"
+    }
+  ];
+
+  const allNews = [...selectedNews, ...additionalNews].slice(0, 6);
+
+  return allNews.map(item => ({
+    ...item,
+    imageUrl: getUniqueImageForNews(usedImages)
+  }));
+};
+
 const Index = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -234,23 +312,26 @@ const Index = () => {
         day: 'numeric' 
       });
       
-      const prompt = `Search Google and find 6 real, latest, and most current news articles about Indian dance and music happening RIGHT NOW in ${currentDate}. Use actual web search capabilities to find breaking news, recent events, and current developments. Each update should include:
-      - title: A compelling headline about CURRENT events from real news sources
-      - description: 2-3 sentences with specific recent details, dates, and current happenings from actual news articles
+      // Create a more focused prompt based on user interests
+      const userInterestsStr = userPreferences.interests.join(', ');
+      const userCategoriesStr = userPreferences.preferredCategories.join(', ');
+      
+      const prompt = `Generate 6 current news articles about Indian dance and music that match these specific interests: ${userInterestsStr} and categories: ${userCategoriesStr}.
+
+      Focus on recent developments in:
+      ${userPreferences.interests.slice(0, 5).map(interest => `- ${interest}`).join('\n')}
+      
+      Each article should be relevant to the user's interests and include:
+      - title: A compelling headline about current events
+      - description: 2-3 sentences with specific recent details from ${currentDate}
       - category: One of (Classical Dance, Folk Dance, Bollywood, Classical Music, Folk Music, Contemporary)
       
-      Focus on user interests: ${userPreferences.interests.join(', ')}, ${userPreferences.preferredCategories.join(', ')}.
-      
-      Search for CURRENT trends like: recent performances this week, ongoing festivals, new song releases, viral dance videos, artist announcements, concert bookings, award ceremonies, digital platform launches, social media trends, government cultural initiatives, international collaborations, emerging artist debuts, breaking entertainment news, recent album launches, dance competitions, music festivals, cultural events.
-      
-      Make sure each news item is from a real, verifiable source and happened TODAY, THIS WEEK, or THIS MONTH. Include specific recent details and current relevance from actual news articles found through web search.
-      
-      Return only valid JSON array format without any markdown formatting:
+      Return only valid JSON array format:
       [
         {
-          "title": "Real news headline from actual source",
-          "description": "Real description from actual news article with specific details",
-          "category": "One of the specified categories"
+          "title": "News headline",
+          "description": "News description",
+          "category": "Category"
         }
       ]`;
 
@@ -270,49 +351,23 @@ const Index = () => {
           imageUrl: getUniqueImageForNews(usedImages)
         }));
         setNewsItems(newsWithImages);
+        toast.success('Latest updates loaded successfully!');
       } else {
-        // Enhanced fallback with unique images
-        const usedImages = new Set<string>();
-        const fallbackNews = [
-          {
-            title: "Today: Sitar Virtuoso Announces Digital Concert Series",
-            description: "Renowned sitarist launches an innovative online concert series featuring classical ragas. The weekly performances will stream live every Friday, showcasing traditional Hindustani music with modern presentation techniques.",
-            category: "Classical Music"
-          },
-          {
-            title: "This Week: Tabla Maestro's New Album Breaks Streaming Records",
-            description: "A fusion album combining traditional tabla rhythms with contemporary beats has garnered over 2 million streams in just three days. The innovative approach is attracting younger audiences to classical Indian percussion.",
-            category: "Classical Music"
-          },
-          {
-            title: "Latest: Bharatanatyam Performance Goes Viral on Social Media",
-            description: "A Chennai-based dancer's contemporary interpretation of classical Bharatanatyam has received 5 million views across platforms. The performance beautifully blends traditional mudras with modern storytelling techniques.",
-            category: "Classical Dance"
-          },
-          {
-            title: "Breaking: Bollywood Music Director Collaborates with Folk Artists",
-            description: "Today's announcement reveals an upcoming album featuring Rajasthani folk musicians collaborating with mainstream Bollywood composers. The project aims to preserve traditional melodies while creating contemporary appeal.",
-            category: "Bollywood"
-          },
-          {
-            title: "Recent: Veena Revival Movement Gains International Recognition",
-            description: "Young musicians worldwide are embracing the ancient veena, with online tutorials surging 300% this month. International music schools are now incorporating this classical Indian instrument into their curriculum.",
-            category: "Classical Music"
-          },
-          {
-            title: "Today: Contemporary Dance Festival Showcases Indian Fusion",
-            description: "The ongoing international dance festival in Mumbai is featuring innovative contemporary pieces that blend classical Indian forms with global dance styles. Tickets for remaining shows are selling out rapidly.",
-            category: "Contemporary"
-          }
-        ].map(item => ({
-          ...item,
-          imageUrl: getUniqueImageForNews(usedImages)
-        }));
-        setNewsItems(fallbackNews);
+        throw new Error('Failed to parse response');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching updates:', error);
-      toast.error('Failed to fetch latest updates');
+      
+      // Enhanced fallback based on user interests
+      if (error.status === 429) {
+        toast.error('API quota exceeded. Using personalized content based on your interests.');
+      } else {
+        toast.error('Failed to fetch latest updates. Showing content based on your interests.');
+      }
+      
+      // Generate interest-based fallback news
+      const fallbackNews = generateInterestBasedNews(userPreferences.interests, userPreferences.preferredCategories);
+      setNewsItems(fallbackNews);
     } finally {
       setLoadingNews(false);
     }
