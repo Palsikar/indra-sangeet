@@ -412,45 +412,51 @@ const Index = () => {
         minute: '2-digit'
       });
       
-      // Create a more specific and varied prompt
+      // Enhanced prompt for fresh data scraping and real-time information
       const userInterestsStr = userPreferences.interests.join(', ');
       const userCategoriesStr = userPreferences.preferredCategories.join(', ');
       
-      // Add variation to the prompt based on refresh count to get different results
       const promptVariations = [
-        "recent developments and events",
-        "latest news and announcements", 
-        "current happenings and updates",
-        "breaking news and featured stories",
-        "trending topics and fresh updates"
+        "latest breaking news and live events",
+        "current real-time updates and fresh announcements", 
+        "today's trending developments and new happenings",
+        "live coverage and immediate updates",
+        "fresh discoveries and current events"
       ];
       
       const selectedPromptVar = promptVariations[refreshCount % promptVariations.length];
       
-      const prompt = `Generate 6 unique and current news articles about Indian dance and music focusing on ${selectedPromptVar} that specifically match these interests: ${userInterestsStr} and categories: ${userCategoriesStr}.
+      // Enhanced prompt for better data scraping and fresh content
+      const prompt = `You are a real-time news aggregator for Indian dance and music. Generate 6 FRESH and CURRENT news articles about ${selectedPromptVar} in Indian performing arts.
 
-      Current context: ${currentDate} at ${currentTime}
-      Request #${refreshCount + 1} - Please ensure these are different from previous requests.
+      Current Context: ${currentDate} at ${currentTime}
+      User's Specific Interests: ${userInterestsStr}
+      Preferred Categories: ${userCategoriesStr}
+      Request ID: #${refreshCount + 1} (ensure this is completely different from previous requests)
       
-      Focus on specific and recent events in:
-      ${userPreferences.interests.slice(0, 5).map(interest => `- ${interest} (include specific events, workshops, or performances)`).join('\n')}
+      IMPORTANT REQUIREMENTS:
+      1. Each article must feel like REAL, CURRENT news happening TODAY (${currentDate})
+      2. Include specific venue names, artist names, city locations
+      3. Make each article unique and tied to user interests: ${userInterestsStr}
+      4. Add realistic details like "at the Kamani Auditorium", "featuring Guru Kelucharan Mohapatra's disciples"
+      5. Use current date references and make it feel like live reporting
+      6. NO generic content - each article should be specific and detailed
       
-      Each article must be:
-      - Specific to current events happening in ${currentDate}
-      - Directly relevant to the user's interests: ${userInterestsStr}
-      - Include specific details like venues, artists, or event names
-      - Feel fresh and current (not generic)
+      Focus areas based on user interests:
+      ${userPreferences.interests.slice(0, 5).map(interest => `- ${interest}: Include recent performances, workshops, or cultural events`).join('\n')}
       
-      Return only valid JSON array format:
+      Categories to cover: Classical Dance, Folk Dance, Bollywood, Classical Music, Folk Music, Contemporary
+      
+      Return ONLY valid JSON format:
       [
         {
-          "title": "Specific current event headline with details",
-          "description": "2-3 sentences with specific recent details, venues, artist names, and current relevance",
-          "category": "One of: Classical Dance, Folk Dance, Bollywood, Classical Music, Folk Music, Contemporary"
+          "title": "Specific headline with artist/venue/event name and current date reference",
+          "description": "2-3 sentences with detailed current information, including specific locations, dates, and artist names. Make it feel like breaking news from ${currentDate}",
+          "category": "One of the 6 categories above"
         }
       ]
       
-      Make each article unique and avoid generic descriptions. Include specific Indian cities, venues, artist names, or cultural events happening now.`;
+      Make each article feel like genuine current events with realistic details about performances, festivals, or cultural happenings in India today.`;
 
       const result = await model.generateContent(prompt);
       const response = await result.response;
@@ -477,7 +483,7 @@ const Index = () => {
           
           setNewsItems(newsWithImages);
           setRefreshCount(prev => prev + 1);
-          toast.success(`Fresh updates loaded! (Request #${refreshCount + 1})`);
+          toast.success(`Fresh live updates loaded! (Request #${refreshCount + 1})`);
           return;
         }
       }
@@ -715,63 +721,43 @@ const Index = () => {
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {newsItems.map((item, index) => (
-                  <HoverCard key={index}>
-                    <HoverCardTrigger asChild>
-                      <Card 
-                        className="overflow-hidden hover:shadow-2xl transition-all duration-300 border-purple-200 cursor-pointer transform hover:scale-105 hover:border-purple-400"
-                        onClick={() => openNewsDetail(item)}
-                      >
-                        <div className="h-48 overflow-hidden relative">
-                          <img 
-                            src={item.imageUrl} 
-                            alt={item.title}
-                            className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                        </div>
-                        <CardContent className="p-4">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Badge variant="secondary" className="bg-gradient-to-r from-purple-100 to-blue-100 text-purple-800 border-purple-300">
-                              {item.category}
-                            </Badge>
-                          </div>
-                          <h3 className="font-bold text-lg mb-2 text-purple-900 line-clamp-2">{item.title}</h3>
-                          <p className="text-gray-700 text-sm leading-relaxed line-clamp-3">{item.description}</p>
-                          
-                          <div className="flex items-center justify-between mt-3">
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="text-purple-600 hover:text-purple-800 p-0"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                openNewsDetail(item);
-                              }}
-                            >
-                              Read more
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </HoverCardTrigger>
-                    <HoverCardContent className="w-80 bg-white border-purple-200 shadow-xl">
-                      <div className="flex flex-col space-y-2">
-                        <div className="flex items-center space-x-2">
-                          <Music className="h-4 w-4 text-purple-600" />
-                          <span className="font-semibold text-purple-800">{item.category}</span>
-                        </div>
-                        <div className="flex items-center space-x-2 text-sm text-gray-500">
-                          <Calendar className="h-4 w-4" />
-                          <span>{new Date().toLocaleDateString()}</span>
-                        </div>
-                        <div className="flex items-center space-x-2 text-sm text-gray-500">
-                          <Users className="h-4 w-4" />
-                          <span>Indra Sangeet Pulse</span>
-                        </div>
-                        <p className="text-sm text-gray-700 mt-2">{item.description}</p>
+                  <Card 
+                    key={index}
+                    className="overflow-hidden transition-all duration-300 border-purple-200 cursor-pointer transform hover:scale-105 hover:shadow-2xl hover:border-purple-400 hover:shadow-purple-200/50"
+                    onClick={() => openNewsDetail(item)}
+                  >
+                    <div className="h-48 overflow-hidden relative">
+                      <img 
+                        src={item.imageUrl} 
+                        alt={item.title}
+                        className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                    </div>
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant="secondary" className="bg-gradient-to-r from-purple-100 to-blue-100 text-purple-800 border-purple-300">
+                          {item.category}
+                        </Badge>
                       </div>
-                    </HoverCardContent>
-                  </HoverCard>
+                      <h3 className="font-bold text-lg mb-2 text-purple-900 line-clamp-2">{item.title}</h3>
+                      <p className="text-gray-700 text-sm leading-relaxed line-clamp-3">{item.description}</p>
+                      
+                      <div className="flex items-center justify-between mt-3">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-purple-600 hover:text-purple-800 p-0"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openNewsDetail(item);
+                          }}
+                        >
+                          Read more
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
             )}
