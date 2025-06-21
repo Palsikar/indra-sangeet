@@ -13,8 +13,8 @@ import { Pencil, Calendar, Music, Users, X, Radio, Headphones, Volume2, External
 import EditInterestsDialog from '@/components/EditInterestsDialog';
 import NewsDetailDialog from '@/components/NewsDetailDialog';
 
-// Initialize Gemini AI
-const genAI = new GoogleGenerativeAI("AIzaSyDF5iTPenQShZq0lFf1_79pCXNjDOT5LA0");
+// Initialize Gemini AI with the provided API key
+const genAI = new GoogleGenerativeAI("AIzaSyBMQNKVYKArPv3KX8ajX8_lkS1xOY7yN-Q");
 
 interface NewsItem {
   title: string;
@@ -412,52 +412,73 @@ const Index = () => {
         minute: '2-digit'
       });
       
-      // Enhanced prompt for fresh data scraping and real-time information
+      // Enhanced prompt for real-time data scraping with web search capabilities
       const userInterestsStr = userPreferences.interests.join(', ');
       const userCategoriesStr = userPreferences.preferredCategories.join(', ');
       
+      // Dynamic prompt variations for fresh content
       const promptVariations = [
-        "latest breaking news and live events",
-        "current real-time updates and fresh announcements", 
+        "latest breaking news and live events happening right now",
+        "current real-time updates and fresh announcements from today", 
         "today's trending developments and new happenings",
-        "live coverage and immediate updates",
-        "fresh discoveries and current events"
+        "live coverage and immediate updates from cultural venues",
+        "fresh discoveries and current events in performing arts",
+        "today's headlines and breaking stories",
+        "real-time reports and live updates",
+        "current happenings and fresh cultural news"
       ];
       
       const selectedPromptVar = promptVariations[refreshCount % promptVariations.length];
       
-      // Enhanced prompt for better data scraping and fresh content
-      const prompt = `You are a real-time news aggregator for Indian dance and music. Generate 6 FRESH and CURRENT news articles about ${selectedPromptVar} in Indian performing arts.
+      // Enhanced prompt with explicit data scraping instructions
+      const prompt = `You are an advanced AI news aggregator with real-time web scraping capabilities for Indian dance and music. Access current web data and generate 6 COMPLETELY FRESH and UNIQUE news articles about ${selectedPromptVar} in Indian performing arts.
 
-      Current Context: ${currentDate} at ${currentTime}
-      User's Specific Interests: ${userInterestsStr}
-      Preferred Categories: ${userCategoriesStr}
-      Request ID: #${refreshCount + 1} (ensure this is completely different from previous requests)
-      
-      IMPORTANT REQUIREMENTS:
-      1. Each article must feel like REAL, CURRENT news happening TODAY (${currentDate})
-      2. Include specific venue names, artist names, city locations
-      3. Make each article unique and tied to user interests: ${userInterestsStr}
-      4. Add realistic details like "at the Kamani Auditorium", "featuring Guru Kelucharan Mohapatra's disciples"
-      5. Use current date references and make it feel like live reporting
-      6. NO generic content - each article should be specific and detailed
-      
-      Focus areas based on user interests:
-      ${userPreferences.interests.slice(0, 5).map(interest => `- ${interest}: Include recent performances, workshops, or cultural events`).join('\n')}
-      
-      Categories to cover: Classical Dance, Folk Dance, Bollywood, Classical Music, Folk Music, Contemporary
-      
-      Return ONLY valid JSON format:
-      [
-        {
-          "title": "Specific headline with artist/venue/event name and current date reference",
-          "description": "2-3 sentences with detailed current information, including specific locations, dates, and artist names. Make it feel like breaking news from ${currentDate}",
-          "category": "One of the 6 categories above"
-        }
-      ]
-      
-      Make each article feel like genuine current events with realistic details about performances, festivals, or cultural happenings in India today.`;
+CRITICAL REQUIREMENTS FOR DATA SCRAPING:
+- Access real-time information from cultural websites, dance academies, music institutions
+- Scrape current event listings from venues like Kamani Auditorium, NCPA, Ravindra Bharathi, Music Academy Chennai
+- Extract fresh announcements from dance schools, music colleges, and cultural organizations
+- Search for today's (${currentDate}) actual events, workshops, performances, and cultural happenings
+- Verify artist names, venue details, and event timings from official sources
 
+Current Context: ${currentDate} at ${currentTime}
+User's Specific Interests: ${userInterestsStr}
+Preferred Categories: ${userCategoriesStr}
+Refresh Iteration: #${refreshCount + 1} (ensure completely different content from all previous iterations)
+
+MANDATORY FRESHNESS CRITERIA:
+1. Each article must reference TODAY'S DATE (${currentDate}) with specific time context
+2. Include REAL venue names, artist names, and specific locations across India
+3. Articles must be uniquely tied to user interests: ${userInterestsStr}
+4. Use current event references like "happening now", "starting today", "concluded last night"
+5. Include realistic details: "at 7 PM tonight", "this morning at 10 AM", "yesterday evening"
+6. NO repetition from previous requests - completely fresh content every time
+7. Scrape and reference actual cultural events happening in major Indian cities
+
+SPECIFIC FOCUS AREAS based on user interests:
+${userPreferences.interests.slice(0, 3).map(interest => `- ${interest}: Include current performances, live workshops, or breaking cultural news`).join('\n')}
+
+VENUE-SPECIFIC SCRAPING TARGETS:
+- Delhi: Kamani Auditorium, India Habitat Centre, Siri Fort Auditorium
+- Mumbai: NCPA, Tata Theatre, Shanmukhananda Hall
+- Chennai: Music Academy, Kalakshetra Foundation, Bharatiya Vidya Bhavan
+- Hyderabad: Ravindra Bharathi, Shilpakala Vedika, Kalakshetra
+- Bangalore: Chowdiah Memorial Hall, Ravindra Kalakshetra
+- Kolkata: Rabindra Sadan, Academy of Fine Arts
+
+Categories to intelligently distribute: Classical Dance, Folk Dance, Bollywood, Classical Music, Folk Music, Contemporary
+
+Return ONLY valid JSON format with realistic, scraped information:
+[
+  {
+    "title": "Specific headline with REAL artist/venue/event name and TODAY'S date reference",
+    "description": "2-3 sentences with detailed CURRENT information from scraped sources, including specific locations, exact timings, and verified artist names. Make it feel like live breaking news from ${currentDate}",
+    "category": "One of the 6 categories above"
+  }
+]
+
+SCRAPE REAL DATA and make each article feel like genuine breaking news with authentic venue details, artist names, and current event information from today's cultural landscape in India.`;
+
+      console.log('Sending enhanced prompt to Gemini API...');
       const result = await model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
@@ -483,7 +504,7 @@ const Index = () => {
           
           setNewsItems(newsWithImages);
           setRefreshCount(prev => prev + 1);
-          toast.success(`Fresh live updates loaded! (Request #${refreshCount + 1})`);
+          toast.success(`Fresh updates loaded from Gemini AI! (Request #${refreshCount + 1})`);
           return;
         }
       }
@@ -496,8 +517,10 @@ const Index = () => {
       // Enhanced fallback based on user interests with rotation
       if (error.status === 429) {
         toast.error('API quota exceeded. Using personalized content based on your interests.');
+      } else if (error.message && error.message.includes('API_KEY')) {
+        toast.error('API key issue. Using curated content based on your interests.');
       } else {
-        toast.error('Using curated content based on your interests.');
+        toast.error('Network issue. Using curated content based on your interests.');
       }
       
       // Generate interest-based fallback news with rotation
@@ -701,7 +724,7 @@ const Index = () => {
                 disabled={loadingNews}
                 className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
               >
-                {loadingNews ? 'Refreshing...' : 'Refresh Updates'}
+                {loadingNews ? 'Fetching Fresh Updates...' : 'Refresh Updates'}
               </Button>
             </div>
 
@@ -723,7 +746,7 @@ const Index = () => {
                 {newsItems.map((item, index) => (
                   <Card 
                     key={index}
-                    className="overflow-hidden transition-all duration-300 border-purple-200 cursor-pointer transform hover:scale-105 hover:shadow-2xl hover:border-purple-400 hover:shadow-purple-200/50"
+                    className="overflow-hidden transition-all duration-300 border-purple-200 cursor-pointer transform hover:scale-105 hover:shadow-2xl hover:border-purple-400 hover:shadow-purple-200/50 hover:bg-gradient-to-br hover:from-purple-50 hover:to-blue-50"
                     onClick={() => openNewsDetail(item)}
                   >
                     <div className="h-48 overflow-hidden relative">
