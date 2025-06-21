@@ -53,82 +53,176 @@ const getUniqueImageForNews = (usedImages: Set<string>) => {
   return selectedImage;
 };
 
-// Enhanced fallback news based on user interests
-const generateInterestBasedNews = (interests: string[], categories: string[]) => {
+// Enhanced fallback news based on user interests with rotation
+const generateInterestBasedNews = (interests: string[], categories: string[], refreshCount: number = 0) => {
   const usedImages = new Set<string>();
   
   const newsTemplates = [
+    // Classical Dance Templates
     {
       interests: ['Bharatanatyam', 'Classical Dance', 'Odissi', 'Kuchipudi'],
-      title: "Classical Dance Festival Showcases Traditional Excellence",
-      description: "A grand classical dance festival featuring Bharatanatyam, Odissi, and Kuchipudi performances is captivating audiences this week. Renowned dancers from across India are presenting traditional pieces with contemporary interpretations.",
-      category: "Classical Dance"
+      templates: [
+        {
+          title: "International Bharatanatyam Festival Announces New Digital Showcase",
+          description: "Leading Bharatanatyam artists are presenting innovative virtual performances this week, blending traditional storytelling with modern technology. The festival features renowned dancers from Chennai and international stages.",
+          category: "Classical Dance"
+        },
+        {
+          title: "Odissi Dance Academy Launches Global Online Masterclasses",
+          description: "Master dancers from Odisha are offering exclusive online workshops teaching authentic Odissi techniques. Students worldwide are joining these sessions to learn traditional mudras and expressions.",
+          category: "Classical Dance"
+        },
+        {
+          title: "Kuchipudi Performance Series Celebrates Ancient Stories",
+          description: "This month's Kuchipudi performances are bringing mythological tales to life with spectacular choreography. Young artists are preserving this art form while adding contemporary interpretations.",
+          category: "Classical Dance"
+        }
+      ]
     },
+    // Classical Music Templates
     {
       interests: ['Hindustani Classical', 'Carnatic Music', 'Sitar', 'Tabla'],
-      title: "Classical Music Concert Series Launches This Month",
-      description: "Master musicians are presenting a series of classical music concerts featuring sitar, tabla, and vocal performances. The events are drawing music enthusiasts from around the world to experience authentic Indian classical traditions.",
-      category: "Classical Music"
+      templates: [
+        {
+          title: "Renowned Sitar Maestro Performs at Cultural Heritage Festival",
+          description: "A legendary sitar virtuoso is captivating audiences with rare ragas this week. The performance includes traditional compositions and modern interpretations that showcase the instrument's versatility.",
+          category: "Classical Music"
+        },
+        {
+          title: "Tabla Ensemble Creates Rhythmic Magic at Music Convention",
+          description: "Master tabla players are demonstrating complex rhythm patterns at the annual percussion festival. The event showcases both solo performances and collaborative pieces with other classical instruments.",
+          category: "Classical Music"
+        },
+        {
+          title: "Carnatic Music Concert Series Features Rising Young Talents",
+          description: "Young Carnatic vocalists are presenting traditional compositions with fresh interpretations. The concert series is highlighting the next generation of classical music artists from South India.",
+          category: "Classical Music"
+        }
+      ]
     },
+    // Folk Dance Templates
     {
       interests: ['Folk Dance', 'Regional Folk Dances', 'Garba', 'Bhangra'],
-      title: "Folk Dance Competition Celebrates Regional Diversity",
-      description: "A vibrant folk dance competition is showcasing the rich diversity of Indian regional dances. Participants are presenting traditional Garba, Bhangra, and other folk forms, celebrating cultural heritage.",
-      category: "Folk Dance"
+      templates: [
+        {
+          title: "Vibrant Garba Competition Lights Up Cultural Festival",
+          description: "Traditional Gujarati Garba dancers are competing in colorful performances this weekend. The event features authentic costumes, live musicians, and dancers of all ages celebrating cultural heritage.",
+          category: "Folk Dance"
+        },
+        {
+          title: "Bhangra Championships Showcase Energetic Punjabi Culture",
+          description: "High-energy Bhangra performances are taking center stage at the regional dance championship. Teams from across Punjab are presenting traditional moves with modern choreographic elements.",
+          category: "Folk Dance"
+        },
+        {
+          title: "Regional Folk Dance Festival Celebrates India's Diversity",
+          description: "Folk dancers from different states are presenting their unique regional styles. The festival includes Lavani from Maharashtra, Bihu from Assam, and other traditional dance forms.",
+          category: "Folk Dance"
+        }
+      ]
     },
+    // Bollywood Templates
     {
       interests: ['Bollywood', 'Contemporary', 'Item Numbers'],
-      title: "Bollywood Dance Workshop Series Gains Popularity",
-      description: "Contemporary Bollywood dance workshops are trending this month, teaching modern choreography techniques. The sessions blend traditional Indian dance with contemporary styles, attracting dancers of all levels.",
-      category: "Bollywood"
+      templates: [
+        {
+          title: "Bollywood Dance Academy Introduces Fusion Choreography Course",
+          description: "Contemporary Bollywood choreographers are teaching fusion techniques that blend classical Indian dance with modern styles. The course attracts dancers looking to expand their repertoire.",
+          category: "Bollywood"
+        },
+        {
+          title: "Item Number Choreography Workshop Gains Popularity",
+          description: "Professional choreographers are conducting workshops on creating engaging item number routines. The sessions cover everything from basic steps to advanced performance techniques.",
+          category: "Bollywood"
+        },
+        {
+          title: "Bollywood Musical Theatre Production Opens This Month",
+          description: "A new musical theatre production combining Bollywood hits with dramatic storytelling is premiering. The show features elaborate dance sequences and live musical performances.",
+          category: "Bollywood"
+        }
+      ]
     },
-    {
-      interests: ['Kathak', 'Manipuri', 'Mohiniyattam'],
-      title: "Traditional Dance Forms Get Digital Spotlight",
-      description: "Classical dance forms like Kathak, Manipuri, and Mohiniyattam are gaining new audiences through digital platforms. Online performances are helping preserve these art forms while reaching global viewers.",
-      category: "Classical Dance"
-    },
+    // Instrumental Music Templates
     {
       interests: ['Veena', 'Flute', 'Violin', 'Harmonium'],
-      title: "Instrumental Music Renaissance Captivates Audiences",
-      description: "Traditional Indian instruments are experiencing a renaissance with young musicians taking up veena, flute, and violin. Contemporary compositions are breathing new life into classical instrumental music.",
-      category: "Classical Music"
+      templates: [
+        {
+          title: "Veena Recital Series Revives Ancient Musical Traditions",
+          description: "Master veena players are performing rare classical compositions that haven't been heard in decades. The recital series aims to preserve and promote this sacred instrument's heritage.",
+          category: "Classical Music"
+        },
+        {
+          title: "Flute Ensemble Creates Meditative Musical Experience",
+          description: "A group of accomplished flutists is presenting peaceful compositions inspired by nature. The performance combines traditional Indian flute techniques with ambient soundscapes.",
+          category: "Classical Music"
+        },
+        {
+          title: "Violin Fusion Concert Bridges Classical and Contemporary",
+          description: "Innovative violinists are blending Carnatic violin techniques with world music influences. The concert showcases how traditional Indian violin can adapt to modern musical contexts.",
+          category: "Classical Music"
+        }
+      ]
     }
   ];
 
-  // Filter templates based on user interests and categories
-  const relevantNews = newsTemplates.filter(template => 
-    template.interests.some(interest => 
+  // Find relevant templates based on user interests
+  const relevantTemplateGroups = newsTemplates.filter(group => 
+    group.interests.some(interest => 
       interests.some(userInterest => 
         userInterest.toLowerCase().includes(interest.toLowerCase()) ||
         interest.toLowerCase().includes(userInterest.toLowerCase())
       )
-    ) || categories.includes(template.category)
+    )
   );
 
-  // If no relevant news found, use all templates
-  const selectedNews = relevantNews.length > 0 ? relevantNews : newsTemplates;
+  // If no relevant templates found, use all templates
+  const selectedGroups = relevantTemplateGroups.length > 0 ? relevantTemplateGroups : newsTemplates;
 
-  // Add additional generic news to reach 6 items
-  const additionalNews = [
-    {
-      title: "Digital Revolution Transforms Indian Performing Arts",
-      description: "Technology is revolutionizing how Indian dance and music are taught, performed, and preserved. Virtual reality experiences and AI-powered learning tools are making traditional arts more accessible to modern audiences.",
-      category: "Contemporary"
-    },
-    {
-      title: "International Collaboration Brings Indian Arts to Global Stage",
-      description: "Indian artists are collaborating with international performers to create fusion works that bridge cultural boundaries. These collaborations are introducing traditional Indian arts to new audiences worldwide.",
-      category: "Contemporary"
-    }
+  // Flatten all templates and rotate based on refresh count
+  const allTemplates = selectedGroups.flatMap(group => group.templates);
+  
+  // Create a rotation based on refresh count to ensure different content each time
+  const rotationOffset = refreshCount % allTemplates.length;
+  const rotatedTemplates = [
+    ...allTemplates.slice(rotationOffset),
+    ...allTemplates.slice(0, rotationOffset)
   ];
 
-  const allNews = [...selectedNews, ...additionalNews].slice(0, 6);
+  // Add time-sensitive elements to make content feel fresh
+  const timeVariations = [
+    "this week", "this month", "today", "this weekend", "currently", "right now"
+  ];
+  
+  const newsVariations = [
+    "announces", "launches", "presents", "showcases", "features", "celebrates", "introduces"
+  ];
 
-  return allNews.map(item => ({
-    ...item,
-    imageUrl: getUniqueImageForNews(usedImages)
-  }));
+  // Select 6 different templates and add dynamic elements
+  const selectedNews = rotatedTemplates.slice(0, 6).map((template, index) => {
+    const timeVar = timeVariations[index % timeVariations.length];
+    const newsVar = newsVariations[index % newsVariations.length];
+    
+    // Add slight variations to titles and descriptions
+    let modifiedTitle = template.title;
+    let modifiedDescription = template.description;
+    
+    // Add current date context to make it feel more current
+    const currentMonth = new Date().toLocaleDateString('en-IN', { month: 'long' });
+    const currentYear = new Date().getFullYear();
+    
+    if (index % 2 === 0) {
+      modifiedDescription = modifiedDescription.replace(/this week|this month/, `in ${currentMonth} ${currentYear}`);
+    }
+    
+    return {
+      title: modifiedTitle,
+      description: modifiedDescription,
+      category: template.category,
+      imageUrl: getUniqueImageForNews(usedImages)
+    };
+  });
+
+  return selectedNews;
 };
 
 const Index = () => {
@@ -147,6 +241,7 @@ const Index = () => {
   const [isEditInterestsOpen, setIsEditInterestsOpen] = useState(false);
   const [selectedNewsItem, setSelectedNewsItem] = useState<NewsItem | null>(null);
   const [isNewsDetailOpen, setIsNewsDetailOpen] = useState(false);
+  const [refreshCount, setRefreshCount] = useState(0);
 
   useEffect(() => {
     // Set up auth state listener
@@ -312,62 +407,98 @@ const Index = () => {
         day: 'numeric' 
       });
       
-      // Create a more focused prompt based on user interests
+      const currentTime = new Date().toLocaleTimeString('en-IN', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      
+      // Create a more specific and varied prompt
       const userInterestsStr = userPreferences.interests.join(', ');
       const userCategoriesStr = userPreferences.preferredCategories.join(', ');
       
-      const prompt = `Generate 6 current news articles about Indian dance and music that match these specific interests: ${userInterestsStr} and categories: ${userCategoriesStr}.
-
-      Focus on recent developments in:
-      ${userPreferences.interests.slice(0, 5).map(interest => `- ${interest}`).join('\n')}
+      // Add variation to the prompt based on refresh count to get different results
+      const promptVariations = [
+        "recent developments and events",
+        "latest news and announcements", 
+        "current happenings and updates",
+        "breaking news and featured stories",
+        "trending topics and fresh updates"
+      ];
       
-      Each article should be relevant to the user's interests and include:
-      - title: A compelling headline about current events
-      - description: 2-3 sentences with specific recent details from ${currentDate}
-      - category: One of (Classical Dance, Folk Dance, Bollywood, Classical Music, Folk Music, Contemporary)
+      const selectedPromptVar = promptVariations[refreshCount % promptVariations.length];
+      
+      const prompt = `Generate 6 unique and current news articles about Indian dance and music focusing on ${selectedPromptVar} that specifically match these interests: ${userInterestsStr} and categories: ${userCategoriesStr}.
+
+      Current context: ${currentDate} at ${currentTime}
+      Request #${refreshCount + 1} - Please ensure these are different from previous requests.
+      
+      Focus on specific and recent events in:
+      ${userPreferences.interests.slice(0, 5).map(interest => `- ${interest} (include specific events, workshops, or performances)`).join('\n')}
+      
+      Each article must be:
+      - Specific to current events happening in ${currentDate}
+      - Directly relevant to the user's interests: ${userInterestsStr}
+      - Include specific details like venues, artists, or event names
+      - Feel fresh and current (not generic)
       
       Return only valid JSON array format:
       [
         {
-          "title": "News headline",
-          "description": "News description",
-          "category": "Category"
+          "title": "Specific current event headline with details",
+          "description": "2-3 sentences with specific recent details, venues, artist names, and current relevance",
+          "category": "One of: Classical Dance, Folk Dance, Bollywood, Classical Music, Folk Music, Contemporary"
         }
-      ]`;
+      ]
+      
+      Make each article unique and avoid generic descriptions. Include specific Indian cities, venues, artist names, or cultural events happening now.`;
 
       const result = await model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
       
+      console.log('Gemini API Response:', text);
+      
       // Extract JSON from the response
       const jsonMatch = text.match(/\[[\s\S]*\]/);
       if (jsonMatch) {
         const parsedNews = JSON.parse(jsonMatch[0]);
-        const usedImages = new Set<string>();
         
-        // Add unique images to each news item
-        const newsWithImages = parsedNews.map((item: NewsItem) => ({
-          ...item,
-          imageUrl: getUniqueImageForNews(usedImages)
-        }));
-        setNewsItems(newsWithImages);
-        toast.success('Latest updates loaded successfully!');
-      } else {
-        throw new Error('Failed to parse response');
+        // Validate that we got proper news items
+        if (parsedNews && Array.isArray(parsedNews) && parsedNews.length > 0) {
+          const usedImages = new Set<string>();
+          
+          // Add unique images to each news item
+          const newsWithImages = parsedNews.map((item: any) => ({
+            title: item.title || 'Cultural Event Update',
+            description: item.description || 'Latest updates in Indian dance and music.',
+            category: item.category || 'Cultural',
+            imageUrl: getUniqueImageForNews(usedImages)
+          }));
+          
+          setNewsItems(newsWithImages);
+          setRefreshCount(prev => prev + 1);
+          toast.success(`Fresh updates loaded! (Request #${refreshCount + 1})`);
+          return;
+        }
       }
+      
+      throw new Error('Invalid response format from Gemini API');
+      
     } catch (error: any) {
       console.error('Error fetching updates:', error);
       
-      // Enhanced fallback based on user interests
+      // Enhanced fallback based on user interests with rotation
       if (error.status === 429) {
         toast.error('API quota exceeded. Using personalized content based on your interests.');
       } else {
-        toast.error('Failed to fetch latest updates. Showing content based on your interests.');
+        toast.error('Using curated content based on your interests.');
       }
       
-      // Generate interest-based fallback news
-      const fallbackNews = generateInterestBasedNews(userPreferences.interests, userPreferences.preferredCategories);
+      // Generate interest-based fallback news with rotation
+      const fallbackNews = generateInterestBasedNews(userPreferences.interests, userPreferences.preferredCategories, refreshCount);
       setNewsItems(fallbackNews);
+      setRefreshCount(prev => prev + 1);
+      toast.success(`Curated updates loaded! (Set #${refreshCount + 1})`);
     } finally {
       setLoadingNews(false);
     }
