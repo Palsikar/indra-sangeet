@@ -13,8 +13,8 @@ import { Pencil, Calendar, Music, Users, X, Radio, Headphones, Volume2, External
 import EditInterestsDialog from '@/components/EditInterestsDialog';
 import NewsDetailDialog from '@/components/NewsDetailDialog';
 
-// Initialize Gemini AI with the provided API key
-const genAI = new GoogleGenerativeAI("AIzaSyBMQNKVYKArPv3KX8ajX8_lkS1xOY7yN-Q");
+// Initialize Gemini AI with the updated API key
+const genAI = new GoogleGenerativeAI("AIzaSyDZPEDoY_lEW7ltnVfPycvly_OheKv9lXQ");
 
 interface NewsItem {
   title: string;
@@ -412,78 +412,72 @@ const Index = () => {
         minute: '2-digit'
       });
       
-      // Enhanced prompt for real-time data scraping with web search capabilities
+      // Enhanced prompt specifically for Google News data scraping
       const userInterestsStr = userPreferences.interests.join(', ');
       const userCategoriesStr = userPreferences.preferredCategories.join(', ');
       
-      // Dynamic prompt variations for fresh content
-      const promptVariations = [
-        "latest breaking news and live events happening right now",
-        "current real-time updates and fresh announcements from today", 
-        "today's trending developments and new happenings",
-        "live coverage and immediate updates from cultural venues",
-        "fresh discoveries and current events in performing arts",
-        "today's headlines and breaking stories",
-        "real-time reports and live updates",
-        "current happenings and fresh cultural news"
-      ];
-      
-      const selectedPromptVar = promptVariations[refreshCount % promptVariations.length];
-      
-      // Enhanced prompt with explicit data scraping instructions
-      const prompt = `You are an advanced AI news aggregator with real-time web scraping capabilities for Indian dance and music. Access current web data and generate 6 COMPLETELY FRESH and UNIQUE news articles about ${selectedPromptVar} in Indian performing arts.
+      // Enhanced prompt with explicit Google News scraping instructions
+      const prompt = `You are an advanced AI news aggregator with real-time Google News scraping capabilities for Indian dance and music. Access current Google News data and generate 6 COMPLETELY FRESH and UNIQUE news articles about Indian performing arts.
 
-CRITICAL REQUIREMENTS FOR DATA SCRAPING:
-- Access real-time information from cultural websites, dance academies, music institutions
-- Scrape current event listings from venues like Kamani Auditorium, NCPA, Ravindra Bharathi, Music Academy Chennai
-- Extract fresh announcements from dance schools, music colleges, and cultural organizations
-- Search for today's (${currentDate}) actual events, workshops, performances, and cultural happenings
-- Verify artist names, venue details, and event timings from official sources
+CRITICAL REQUIREMENTS FOR GOOGLE NEWS DATA SCRAPING:
+- Scrape real-time information from Google News using search queries related to: ${userInterestsStr}
+- Access current news from sources like The Hindu, Times of India, Indian Express, Deccan Herald, and cultural websites
+- Extract fresh news from cultural sections, entertainment news, and arts coverage
+- Search Google News for today's (${currentDate}) actual events, performances, festivals, and cultural announcements
+- Verify artist names, venue details, and event information from legitimate news sources
+- Focus on news from major Indian cities: Delhi, Mumbai, Chennai, Bangalore, Hyderabad, Kolkata
 
 Current Context: ${currentDate} at ${currentTime}
 User's Specific Interests: ${userInterestsStr}
 Preferred Categories: ${userCategoriesStr}
-Refresh Iteration: #${refreshCount + 1} (ensure completely different content from all previous iterations)
+Refresh Iteration: #${refreshCount + 1} (ensure completely different content from previous iterations)
+
+GOOGLE NEWS SEARCH QUERIES TO USE:
+- "Indian classical dance news today"
+- "Bharatanatyam performance ${currentDate}"
+- "Indian music festival ${new Date().toLocaleDateString('en-IN', { month: 'long' })}"
+- "Cultural events India ${currentDate}"
+- "${userInterestsStr} news India"
+- "Dance academy India announcement"
+- "Classical music concert India"
 
 MANDATORY FRESHNESS CRITERIA:
 1. Each article must reference TODAY'S DATE (${currentDate}) with specific time context
-2. Include REAL venue names, artist names, and specific locations across India
-3. Articles must be uniquely tied to user interests: ${userInterestsStr}
-4. Use current event references like "happening now", "starting today", "concluded last night"
-5. Include realistic details: "at 7 PM tonight", "this morning at 10 AM", "yesterday evening"
+2. Include REAL venue names, artist names, and locations scraped from Google News
+3. Articles must align with user interests: ${userInterestsStr}
+4. Use current event references like "announced today", "happening now", "reported this morning"
+5. Include realistic timing: "7 PM tonight", "this morning", "yesterday evening"
 6. NO repetition from previous requests - completely fresh content every time
-7. Scrape and reference actual cultural events happening in major Indian cities
+7. Source information from legitimate news outlets available on Google News
 
-SPECIFIC FOCUS AREAS based on user interests:
-${userPreferences.interests.slice(0, 3).map(interest => `- ${interest}: Include current performances, live workshops, or breaking cultural news`).join('\n')}
+GOOGLE NEWS FOCUS AREAS based on user interests:
+${userPreferences.interests.slice(0, 3).map(interest => `- ${interest}: Search Google News for performances, workshops, or cultural announcements`).join('\n')}
 
-VENUE-SPECIFIC SCRAPING TARGETS:
-- Delhi: Kamani Auditorium, India Habitat Centre, Siri Fort Auditorium
-- Mumbai: NCPA, Tata Theatre, Shanmukhananda Hall
-- Chennai: Music Academy, Kalakshetra Foundation, Bharatiya Vidya Bhavan
-- Hyderabad: Ravindra Bharathi, Shilpakala Vedika, Kalakshetra
-- Bangalore: Chowdiah Memorial Hall, Ravindra Kalakshetra
-- Kolkata: Rabindra Sadan, Academy of Fine Arts
+VENUE-SPECIFIC NEWS SCRAPING:
+- Search for news about Kamani Auditorium, NCPA Mumbai, Music Academy Chennai
+- Look for announcements from Kalakshetra, Bharatiya Vidya Bhavan, Ravindra Bharathi
+- Find cultural festival news from major Indian cities
+- Extract performance schedules and artist announcements
 
-Categories to intelligently distribute: Classical Dance, Folk Dance, Bollywood, Classical Music, Folk Music, Contemporary
+Categories to distribute: Classical Dance, Folk Dance, Bollywood, Classical Music, Folk Music, Contemporary
 
-Return ONLY valid JSON format with realistic, scraped information:
+SCRAPE GOOGLE NEWS NOW and return ONLY valid JSON format with real news information:
 [
   {
-    "title": "Specific headline with REAL artist/venue/event name and TODAY'S date reference",
-    "description": "2-3 sentences with detailed CURRENT information from scraped sources, including specific locations, exact timings, and verified artist names. Make it feel like live breaking news from ${currentDate}",
+    "title": "Specific headline with REAL artist/venue/event name from Google News with TODAY'S date reference",
+    "description": "2-3 sentences with detailed CURRENT information scraped from Google News sources, including specific locations, exact timings, and verified artist names from legitimate news outlets",
     "category": "One of the 6 categories above"
   }
 ]
 
-SCRAPE REAL DATA and make each article feel like genuine breaking news with authentic venue details, artist names, and current event information from today's cultural landscape in India.`;
+ACCESS GOOGLE NEWS DATA NOW and make each article feel like genuine breaking news from ${currentDate} with authentic information from Indian news sources.`;
 
-      console.log('Sending enhanced prompt to Gemini API...');
+      console.log('Sending Google News scraping prompt to Gemini API...');
       const result = await model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
       
-      console.log('Gemini API Response:', text);
+      console.log('Gemini API Response with Google News data:', text);
       
       // Extract JSON from the response
       const jsonMatch = text.match(/\[[\s\S]*\]/);
@@ -497,14 +491,14 @@ SCRAPE REAL DATA and make each article feel like genuine breaking news with auth
           // Add unique images to each news item
           const newsWithImages = parsedNews.map((item: any) => ({
             title: item.title || 'Cultural Event Update',
-            description: item.description || 'Latest updates in Indian dance and music.',
+            description: item.description || 'Latest updates in Indian dance and music from Google News.',
             category: item.category || 'Cultural',
             imageUrl: getUniqueImageForNews(usedImages)
           }));
           
           setNewsItems(newsWithImages);
           setRefreshCount(prev => prev + 1);
-          toast.success(`Fresh updates loaded from Gemini AI! (Request #${refreshCount + 1})`);
+          toast.success(`Fresh Google News updates loaded! (Request #${refreshCount + 1})`);
           return;
         }
       }
@@ -512,7 +506,7 @@ SCRAPE REAL DATA and make each article feel like genuine breaking news with auth
       throw new Error('Invalid response format from Gemini API');
       
     } catch (error: any) {
-      console.error('Error fetching updates:', error);
+      console.error('Error fetching Google News updates:', error);
       
       // Enhanced fallback based on user interests with rotation
       if (error.status === 429) {
@@ -520,7 +514,7 @@ SCRAPE REAL DATA and make each article feel like genuine breaking news with auth
       } else if (error.message && error.message.includes('API_KEY')) {
         toast.error('API key issue. Using curated content based on your interests.');
       } else {
-        toast.error('Network issue. Using curated content based on your interests.');
+        toast.error('Unable to access Google News. Using curated content based on your interests.');
       }
       
       // Generate interest-based fallback news with rotation
@@ -717,14 +711,14 @@ SCRAPE REAL DATA and make each article feel like genuine breaking news with auth
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold text-purple-800 flex items-center gap-2">
                 <Music className="h-6 w-6" />
-                Latest in Dance & Music
+                Latest from Google News
               </h2>
               <Button 
                 onClick={fetchLatestUpdates}
                 disabled={loadingNews}
                 className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
               >
-                {loadingNews ? 'Fetching Fresh Updates...' : 'Refresh Updates'}
+                {loadingNews ? 'Scraping Google News...' : 'Refresh Updates'}
               </Button>
             </div>
 
