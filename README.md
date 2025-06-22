@@ -1,73 +1,65 @@
-# Welcome to your Lovable project
+# 🎶 Indra Sangeet
 
-## Project info
+A beautifully designed web application to classify and explore Indian musical instruments using machine learning and web technologies.
 
-**URL**: https://lovable.dev/projects/4fe9d296-1042-42c8-8619-d1cf951bc140
+## 🌐 Live Application
 
-## How can I edit this code?
+**Website**: [indra-sangeet.lovable.app](https://indra-sangeet.lovable.app/)
 
-There are several ways of editing your application.
+## 🧠 Project Description
 
-**Use Lovable**
+Indra Sangeet is an interactive web app that identifies Indian classical musical instruments from uploaded images using a machine learning model. It also provides brief cultural and musical descriptions of each instrument, making it both a technical and educational tool.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/4fe9d296-1042-42c8-8619-d1cf951bc140) and start prompting.
+This project combines:
+- An AI-powered instrument classifier
+- Elegant and responsive frontend design
+- Seamless deployment and hosting
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🔍 Related Projects
 
-**Use your preferred IDE**
+- [Dance and Music Information Portal](https://palsikar.github.io/dance-and-music/minisrd/)  
+  A mini information portal about Indian classical dance and music styles with structured data representation.
+  
+- [Musical Instrument Classifier](https://v0-musical-instrument-classifier.vercel.app/)  
+  A demo version of the ML classifier that powers Indra Sangeet, built using React and TensorFlow.js.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 🚀 Tech Stack
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- **Frontend**: React, TypeScript, Tailwind CSS
+- **Machine Learning**: TensorFlow.js
+- **Hosting**: Vercel
+- **Design**: Responsive UI using utility-first CSS (Tailwind)
 
-Follow these steps:
+## ✨ Features
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- Upload images to classify Indian musical instruments
+- View brief descriptions of classified instruments
+- Responsive and modern UI
+- Fast, client-side inference using TensorFlow.js
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 🛠️ Setup & Installation
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+# Clone the repository
+git clone https://github.com/Palsikar/indra-sangeet.git
+cd indra-sangeet
+
+# Install dependencies
+npm install
+
+# Run the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## 🙏 Acknowledgments
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+**Inspired by Indian classical music traditions**
 
-**Use GitHub Codespaces**
+**Built and maintained by Mayank Palsikar**
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
 
-## What technologies are used for this project?
 
-This project is built with:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
 
-## How can I deploy this project?
 
-Simply open [Lovable](https://lovable.dev/projects/4fe9d296-1042-42c8-8619-d1cf951bc140) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
