@@ -278,12 +278,12 @@ const Index = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Load user preferences and fetch news when preferences change
-  useEffect(() => {
-    if (user && userPreferences.interests.length > 0) {
-      fetchLatestUpdates();
-    }
-  }, [userPreferences, user]);
+  // Remove the automatic news fetching when preferences change
+  // useEffect(() => {
+  //   if (user && userPreferences.interests.length > 0) {
+  //     fetchLatestUpdates();
+  //   }
+  // }, [userPreferences, user]);
 
   const loadUserPreferences = async (userId: string) => {
     try {
@@ -397,6 +397,12 @@ const Index = () => {
   };
 
   const fetchLatestUpdates = async () => {
+    // Check if user has interests before fetching
+    if (userPreferences.interests.length === 0) {
+      toast.error('Please add some interests first to get personalized updates!');
+      return;
+    }
+
     setLoadingNews(true);
     try {
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -715,12 +721,32 @@ ACCESS GOOGLE NEWS DATA NOW and make each article feel like genuine breaking new
               </h2>
               <Button 
                 onClick={fetchLatestUpdates}
-                disabled={loadingNews}
-                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                disabled={loadingNews || userPreferences.interests.length === 0}
+                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:opacity-50"
               >
                 {loadingNews ? 'Scraping Google News...' : 'Refresh Updates'}
               </Button>
             </div>
+
+            {userPreferences.interests.length === 0 && (
+              <Card className="border-orange-200 bg-orange-50">
+                <CardContent className="p-4">
+                  <p className="text-orange-800 text-center">
+                    Please add some interests in the "My Interests" tab, then click "Refresh Updates" to get personalized news!
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
+            {newsItems.length === 0 && userPreferences.interests.length > 0 && !loadingNews && (
+              <Card className="border-blue-200 bg-blue-50">
+                <CardContent className="p-4">
+                  <p className="text-blue-800 text-center">
+                    Click "Refresh Updates" to fetch the latest news based on your interests!
+                  </p>
+                </CardContent>
+              </Card>
+            )}
 
             {loadingNews ? (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
