@@ -589,41 +589,55 @@ ACCESS GOOGLE NEWS DATA NOW and make each article feel like genuine breaking new
 
   if (!user) {
     return (
-      <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4">
+      <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
         {/* Background Video */}
         <video 
           autoPlay 
           loop 
           muted 
           playsInline
+          preload="auto"
           className="absolute inset-0 w-full h-full object-cover z-0"
+          onError={(e) => {
+            console.error('Video failed to load:', e);
+            const target = e.target as HTMLVideoElement;
+            target.style.display = 'none';
+            toast.error('Background video failed to load - using fallback background');
+          }}
+          onLoadStart={() => console.log('Video loading started')}
+          onCanPlay={() => console.log('Video can play')}
+          onLoadedData={() => console.log('Video loaded successfully')}
         >
           <source src="/lovable-uploads/shiva.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
         </video>
         
+        {/* Fallback gradient background - visible if video fails */}
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/90 via-blue-900/90 to-indigo-900/90 z-5"></div>
+        
         {/* Dark Overlay for Better Text Readability */}
-        <div className="absolute inset-0 bg-black/50 z-10"></div>
+        <div className="absolute inset-0 bg-black/40 z-10"></div>
         
         {/* Musical Background Elements */}
-        <div className="absolute inset-0 opacity-10 z-20">
-          <div className="absolute top-20 left-20 text-6xl">🎵</div>
-          <div className="absolute top-40 right-32 text-4xl">🎶</div>
-          <div className="absolute bottom-32 left-16 text-5xl">🎼</div>
-          <div className="absolute bottom-20 right-20 text-6xl">🎹</div>
-          <div className="absolute top-60 left-1/2 text-3xl">🥁</div>
+        <div className="absolute inset-0 opacity-20 z-20">
+          <div className="absolute top-20 left-20 text-6xl animate-pulse">🎵</div>
+          <div className="absolute top-40 right-32 text-4xl animate-pulse delay-1000">🎶</div>
+          <div className="absolute bottom-32 left-16 text-5xl animate-pulse delay-2000">🎼</div>
+          <div className="absolute bottom-20 right-20 text-6xl animate-pulse delay-3000">🎹</div>
+          <div className="absolute top-60 left-1/2 text-3xl animate-pulse delay-4000">🥁</div>
         </div>
         
         <div className="w-full max-w-md relative z-30">
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-2 mb-4">
-              <Music className="h-8 w-8 text-white drop-shadow-lg" />
+              <Music className="h-8 w-8 text-white drop-shadow-lg animate-bounce" />
               <h1 className="text-4xl font-bold text-white drop-shadow-lg">Indra Sangeet Pulse</h1>
-              <Radio className="h-8 w-8 text-white drop-shadow-lg" />
+              <Radio className="h-8 w-8 text-white drop-shadow-lg animate-bounce delay-500" />
             </div>
-            <p className="text-white drop-shadow-md">Your gateway to Indian dance & music updates</p>
+            <p className="text-white drop-shadow-md opacity-90">Your gateway to Indian dance & music updates</p>
           </div>
           
-          <Card className="shadow-2xl border-white/20 bg-white/90 backdrop-blur-lg">
+          <Card className="shadow-2xl border-white/20 bg-white/95 backdrop-blur-lg">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl text-purple-800 flex items-center justify-center gap-2">
                 <Headphones className="h-6 w-6" />
