@@ -589,9 +589,23 @@ ACCESS GOOGLE NEWS DATA NOW and make each article feel like genuine breaking new
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4">
+        {/* Background Video */}
+        <video 
+          autoPlay 
+          loop 
+          muted 
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover z-0"
+        >
+          <source src="/lovable-uploads/shiva.mp4" type="video/mp4" />
+        </video>
+        
+        {/* Dark Overlay for Better Text Readability */}
+        <div className="absolute inset-0 bg-black/50 z-10"></div>
+        
         {/* Musical Background Elements */}
-        <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0 opacity-10 z-20">
           <div className="absolute top-20 left-20 text-6xl">🎵</div>
           <div className="absolute top-40 right-32 text-4xl">🎶</div>
           <div className="absolute bottom-32 left-16 text-5xl">🎼</div>
@@ -599,17 +613,17 @@ ACCESS GOOGLE NEWS DATA NOW and make each article feel like genuine breaking new
           <div className="absolute top-60 left-1/2 text-3xl">🥁</div>
         </div>
         
-        <div className="w-full max-w-md relative z-10">
+        <div className="w-full max-w-md relative z-30">
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-2 mb-4">
-              <Music className="h-8 w-8 text-purple-300" />
-              <h1 className="text-4xl font-bold text-white">Indra Sangeet Pulse</h1>
-              <Radio className="h-8 w-8 text-purple-300" />
+              <Music className="h-8 w-8 text-white drop-shadow-lg" />
+              <h1 className="text-4xl font-bold text-white drop-shadow-lg">Indra Sangeet Pulse</h1>
+              <Radio className="h-8 w-8 text-white drop-shadow-lg" />
             </div>
-            <p className="text-purple-200">Your gateway to Indian dance & music updates</p>
+            <p className="text-white drop-shadow-md">Your gateway to Indian dance & music updates</p>
           </div>
           
-          <Card className="shadow-2xl border-purple-300 bg-white/95 backdrop-blur-sm">
+          <Card className="shadow-2xl border-white/20 bg-white/90 backdrop-blur-lg">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl text-purple-800 flex items-center justify-center gap-2">
                 <Headphones className="h-6 w-6" />
