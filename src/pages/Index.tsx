@@ -599,6 +599,7 @@ ACCESS GOOGLE NEWS DATA NOW and make each article feel like genuine breaking new
           preload="auto"
           controls={false}
           className="absolute inset-0 w-full h-full object-cover z-0"
+          src="/lovable-uploads/shiva.mp4"
           onError={(e) => {
             console.error('Video failed to load - Error details:', {
               error: e.nativeEvent,
@@ -615,9 +616,6 @@ ACCESS GOOGLE NEWS DATA NOW and make each article feel like genuine breaking new
           onLoadedData={() => console.log('Video loaded successfully')}
           onLoad={() => console.log('Video element loaded')}
         >
-          <source src="./lovable-uploads/shiva.mp4" type="video/mp4" />
-          <source src="/lovable-uploads/shiva.mp4" type="video/mp4" />
-          <source src="./public/lovable-uploads/shiva.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
         
