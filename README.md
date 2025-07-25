@@ -1,6 +1,6 @@
 # 🎶 Indra Sangeet
 
-A beautifully designed web application to classify and explore Indian musical instruments using machine learning and web technologies.
+A beautifully designed web application to classify and explore Indian musical instruments using machine learning and web developing technologies.
 
 ## 🌐 Live Application
 
