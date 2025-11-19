@@ -278,12 +278,12 @@ const Index = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Remove the automatic news fetching when preferences change
-  // useEffect(() => {
-  //   if (user && userPreferences.interests.length > 0) {
-  //     fetchLatestUpdates();
-  //   }
-  // }, [userPreferences, user]);
+  // Automatically fetch news when user has interests
+  useEffect(() => {
+    if (user && userPreferences.interests.length > 0) {
+      fetchLatestUpdates();
+    }
+  }, [userPreferences.interests.length, user]);
 
   const loadUserPreferences = async (userId: string) => {
     try {
@@ -843,19 +843,11 @@ ACCESS GOOGLE NEWS DATA NOW and make each article feel like genuine breaking new
 
           <TabsContent value="preferences" className="space-y-6">
             <Card className="border-purple-200 shadow-lg">
-              <CardHeader className="flex flex-row items-center justify-between bg-gradient-to-r from-purple-50 to-blue-50">
+              <CardHeader className="bg-gradient-to-r from-purple-50 to-blue-50">
                 <CardTitle className="text-purple-800 flex items-center gap-2">
                   <Headphones className="h-5 w-5" />
                   Your Musical Interests
                 </CardTitle>
-                <Button 
-                  onClick={() => setIsEditInterestsOpen(true)}
-                  variant="outline"
-                  size="sm"
-                  className="border-purple-300 text-purple-700 hover:bg-purple-100 flex items-center gap-1"
-                >
-                  <Pencil className="h-4 w-4" /> Edit Interests
-                </Button>
               </CardHeader>
               <CardContent className="space-y-4 p-6">
                 <div>
